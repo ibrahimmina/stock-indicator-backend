@@ -1,0 +1,377 @@
+openapi: 3.0.3
+info:
+  title: Stock Indicator Analysis Open API
+  description: |-
+    Stock Indicator Analysis API is used to get various stock indicator results based on the test required to be performed
+    The API is to be consumed by the frontend team to display the charts required for the stock analysis and indicators
+  version: 0.0.1
+servers:
+- url: http://3.84.200.180/
+security:
+- ApiKeyAuth: []
+tags:
+- name: Overlays
+  description: Technical indicators that use the same scale as prices are plotted
+    over the top of the prices on a stock chart.
+- name: Oscillators
+  description: Technical indicators that oscillate between a local minimum and maximum
+    are plotted above or below a price chart.
+paths:
+  /sma:
+    get:
+      tags:
+      - Overlays
+      summary: The average price over the specified period
+      operationId: calculate_sma
+      parameters:
+      - name: symbol
+        in: query
+        description: Ticker Symbol Required
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Start Date of Analysis in YYYY-MM-DD Format
+        required: true
+        style: form
+        explode: true
+        schema:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2019-05-17
+      - name: period
+        in: query
+        description: The Analysis Period in Days from Start Date
+        required: true
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+      - name: length
+        in: query
+        description: The short period
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 5
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/sma'
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: symbol not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.overlays_controller
+  /ema:
+    get:
+      tags:
+      - Overlays
+      summary: The average price over the specified period
+      operationId: calculate_ema
+      parameters:
+      - name: symbol
+        in: query
+        description: Ticker Symbol Required
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Start Date of Analysis in YYYY-MM-DD Format
+        required: true
+        style: form
+        explode: true
+        schema:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2019-05-17
+      - name: period
+        in: query
+        description: The Analysis Period in Days from Start Date
+        required: true
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+      - name: length
+        in: query
+        description: The short period
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 5
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ema'
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: symbol not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.overlays_controller
+  /bollinger:
+    get:
+      tags:
+      - Overlays
+      summary: An oscillator meaning that it operates between or within a set range
+        of numbers or parameters..
+      operationId: calculate_bollinger_bands
+      parameters:
+      - name: symbol
+        in: query
+        description: Ticker Symbol Required
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Start Date of Analysis in YYYY-MM-DD Format
+        required: true
+        style: form
+        explode: true
+        schema:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2019-05-17
+      - name: period
+        in: query
+        description: The Analysis Period in Days from Start Date
+        required: true
+        style: form
+        explode: true
+        schema:
+          minimum: 1
+          type: integer
+      - name: length
+        in: query
+        description: The short period
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 5
+      - name: standard_deviation
+        in: query
+        description: The long period
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+          default: 2
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/bollinger'
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: symbol not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.overlays_controller
+components:
+  schemas:
+    sma:
+      type: object
+      properties:
+        Date:
+          type: array
+          items:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: "2023-01-06, 2023-01-07"
+        Close:
+          type: array
+          items:
+            type: number
+        SMA:
+          type: array
+          items:
+            type: number
+      example:
+        SMA:
+        - 6.02745618307040320615897144307382404804229736328125
+        - 6.02745618307040320615897144307382404804229736328125
+        Close:
+        - 0.80082819046101150206595775671303272247314453125
+        - 0.80082819046101150206595775671303272247314453125
+        Date:
+        - "2023-01-06, 2023-01-07"
+        - "2023-01-06, 2023-01-07"
+    ema:
+      type: object
+      properties:
+        Date:
+          type: array
+          items:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: "2023-01-06, 2023-01-07"
+        Close:
+          type: array
+          items:
+            type: number
+        EMA:
+          type: array
+          items:
+            type: number
+      example:
+        EMA:
+        - 6.02745618307040320615897144307382404804229736328125
+        - 6.02745618307040320615897144307382404804229736328125
+        Close:
+        - 0.80082819046101150206595775671303272247314453125
+        - 0.80082819046101150206595775671303272247314453125
+        Date:
+        - "2023-01-06, 2023-01-07"
+        - "2023-01-06, 2023-01-07"
+    bollinger:
+      type: object
+      properties:
+        Date:
+          type: array
+          items:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: "2023-01-06, 2023-01-07"
+        BBL:
+          type: array
+          items:
+            type: number
+        BBM:
+          type: array
+          items:
+            type: number
+        BBU:
+          type: array
+          items:
+            type: number
+        Close:
+          type: array
+          items:
+            type: number
+      example:
+        BBU:
+        - 1.46581298050294517310021547018550336360931396484375
+        - 1.46581298050294517310021547018550336360931396484375
+        Close:
+        - 5.962133916683182377482808078639209270477294921875
+        - 5.962133916683182377482808078639209270477294921875
+        BBM:
+        - 6.02745618307040320615897144307382404804229736328125
+        - 6.02745618307040320615897144307382404804229736328125
+        BBL:
+        - 0.80082819046101150206595775671303272247314453125
+        - 0.80082819046101150206595775671303272247314453125
+        Date:
+        - "2023-01-06, 2023-01-07"
+        - "2023-01-06, 2023-01-07"
+  responses:
+    UnauthorizedError:
+      description: API key is missing or invalid
+  parameters:
+    symbol:
+      name: symbol
+      in: query
+      description: Ticker Symbol Required
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: string
+    start_date:
+      name: start_date
+      in: query
+      description: Start Date of Analysis in YYYY-MM-DD Format
+      required: true
+      style: form
+      explode: true
+      schema:
+        pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        type: string
+        format: Date
+        example: 2019-05-17
+    end_date:
+      name: end_date
+      in: query
+      description: End Date of Analysis in YYYY-MM-DD Format
+      required: true
+      style: form
+      explode: true
+      schema:
+        pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        type: string
+        format: Date
+        example: 2019-05-17
+    period:
+      name: period
+      in: query
+      description: The Analysis Period in Days from Start Date
+      required: true
+      style: form
+      explode: true
+      schema:
+        minimum: 1
+        type: integer
+    length:
+      name: length
+      in: query
+      description: The short period
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        default: 5
+    standard_deviation:
+      name: standard_deviation
+      in: query
+      description: The long period
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        default: 2
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: X-API-KEY
+      in: header
+      x-apikeyInfoFunc: swagger_server.controllers.authorization_controller.check_ApiKeyAuth
+
