@@ -14,6 +14,8 @@ def check_ApiKeyAuth(api_key, required_scopes):
 
     info = TOKEN_DB.get(api_key, None)
 
+    print(os.environ.get('api_key'))
+
     if not info:
         raise OAuthProblem("Invalid token")
 
