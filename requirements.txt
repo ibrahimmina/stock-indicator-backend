@@ -7,6 +7,7 @@ click==8.1.7
 clickclick==20.10.2
 connexion==2.14.2
 Flask==2.2.5
+Flask-Cors==4.0.0
 frozendict==2.4.0
 gunicorn==21.2.0
 html5lib==1.1
