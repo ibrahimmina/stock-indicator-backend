@@ -108,7 +108,6 @@ def calculate_sma(symbol, start_date, period, length=5):  # noqa: E501
 
 
     stock=get_historical_data(symbol, start_date,period,length)
-    print(stock)
     sma = stock.ta.sma(close="Close", length=length).dropna()
     outputdf = pd.merge(stock, sma, left_index=True, right_index=True)
     jsondf = outputdf.drop(['Open', 'High', 'Low', 'Adj Close', 'Volume'], axis=1)
