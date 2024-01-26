@@ -7,7 +7,8 @@ from six import BytesIO
 
 from swagger_server.models.bollinger import Bollinger  # noqa: E501
 from swagger_server.models.ema import Ema  # noqa: E501
-from swagger_server.models.sma import Sma  # noqa: E501
+from swagger_server.models.psar import Psar  # noqa: E501
+from swagger_server.models.sma import Sma  # noqa: E502
 from swagger_server.test import BaseTestCase
 
 
@@ -42,6 +43,24 @@ class TestOverlaysController(BaseTestCase):
                         ('length', 5)]
         response = self.client.open(
             '//ema',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+    
+    def test_calculate_psar(self):
+        """Test case for calculate_psar
+
+        An oscillator meaning that it operates between or within a set range of numbers or parameters..
+        """
+        query_string = [('symbol', 'symbol_example'),
+                        ('start_date', 'start_date_example'),
+                        ('period', 2),
+                        ('initial_acceleration', 0.02),
+                        ('acceleration', 0.02),
+                        ('max_acceleration', 0.2)]
+        response = self.client.open(
+            '//psar',
             method='GET',
             query_string=query_string)
         self.assert200(response,

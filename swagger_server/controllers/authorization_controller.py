@@ -1,6 +1,6 @@
 from typing import List
 from connexion.exceptions import OAuthProblem
-import os
+from flask import current_app
 
 """
 controller generated to handled auth operation described at:
@@ -8,7 +8,7 @@ https://connexion.readthedocs.io/en/latest/security.html
 """
 
 
-TOKEN_DB = {os.environ.get('api_key'): {"uid": 100}}
+TOKEN_DB = {current_app.config['API_KEY']: {"uid": 100}}
 
 def check_ApiKeyAuth(api_key, required_scopes):
 

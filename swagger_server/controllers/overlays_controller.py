@@ -3,30 +3,22 @@ import six
 
 from swagger_server.models.bollinger import Bollinger  # noqa: E501
 from swagger_server.models.ema import Ema  # noqa: E501
-from swagger_server.models.sma import Sma  # noqa: E501
+from swagger_server.models.psar import Psar  # noqa: E501
+from swagger_server.models.sma import Sma  # noqa: E502
 from swagger_server import util
 
 import pandas as pd
 import pandas_ta as ta
-import yfinance as yf
 from datetime import datetime, timedelta
+from flask import current_app
 
-from polygon import RESTClient
 
-def get_historical_data_polygon(symbol,start_date,period,length):
-    input_start = datetime.strptime(start_date, "%Y-%m-%d")
-    start = input_start - timedelta(days=length+1)
-    end = input_start + timedelta(days=period)
-    client = RESTClient(trace=True)
-    stock = client.list_aggs(symbol,1,"day",start,end)
-    return stock
+from swagger_server.controllers.get_historical_data import get_historical_data_polygon, get_historical_data_yfinance
+from swagger_server.controllers.date_util import get_end_date, get_historical_start_date
 
-def get_historical_data(symbol,start_date,period,length):
-    input_start = datetime.strptime(start_date, "%Y-%m-%d")
-    start = input_start - timedelta(days=length+1)
-    end = input_start + timedelta(days=period)
-    stock=yf.download(symbol, start=start, end=end)
-    return stock
+USE_POLYGON = current_app.config['USE_POLYGON']
+
+
 
 def calculate_bollinger_bands(symbol, start_date, period, length=5, standard_deviation=2):  # noqa: E501
     """An oscillator meaning that it operates between or within a set range of numbers or parameters..
@@ -47,7 +39,14 @@ def calculate_bollinger_bands(symbol, start_date, period, length=5, standard_dev
     :rtype: Bollinger
     """
 
-    stock=get_historical_data(symbol, start_date,period,length)
+    start = get_historical_start_date(start_date,length)
+    end = get_end_date(start_date,period)
+
+    if USE_POLYGON == True:
+        stock=get_historical_data_polygon(symbol,start,end)
+    else:
+        stock=get_historical_data_yfinance(symbol,start,end)
+    
     bbands = stock.ta.bbands(close="Close", std=standard_deviation, length=length).dropna()
     bbands = pd.merge(stock, bbands, left_index=True, right_index=True)
     bbands.columns = bbands.columns.str.replace("_*.\d", "", regex=True)
@@ -77,7 +76,14 @@ def calculate_ema(symbol, start_date, period, length=5):  # noqa: E501
     :rtype: Ema
     """
 
-    stock=get_historical_data(symbol, start_date,period,length)
+    start = get_historical_start_date(start_date,length)
+    end = get_end_date(start_date,period)
+
+    if USE_POLYGON == True:
+        stock=get_historical_data_polygon(symbol,start,end)
+    else:
+        stock=get_historical_data_yfinance(symbol,start,end)
+    
     ema = stock.ta.ema(close="Close", length=length).dropna()
     outputdf = pd.merge(stock, ema, left_index=True, right_index=True)
     jsondf = outputdf.drop(['Open', 'High', 'Low', 'Adj Close', 'Volume'], axis=1)
@@ -88,6 +94,48 @@ def calculate_ema(symbol, start_date, period, length=5):  # noqa: E501
     output = Ema(jsondf['Date'].values.tolist(), jsondf['Close'].values.tolist(), jsondf['EMA'].values.tolist())
 
     return output
+
+
+def calculate_psar(symbol, start_date, period, initial_acceleration=None, acceleration=None, max_acceleration=None):  # noqa: E501
+    """An oscillator meaning that it operates between or within a set range of numbers or parameters..
+
+     # noqa: E501
+
+    :param symbol: Ticker Symbol Required
+    :type symbol: str
+    :param start_date: Start Date of Analysis in YYYY-MM-DD Format
+    :type start_date: str
+    :param period: The Analysis Period in Days from Start Date
+    :type period: int
+    :param initial_acceleration: The psar initial acceleration
+    :type initial_acceleration: float
+    :param acceleration: The psar acceleration
+    :type acceleration: float
+    :param max_acceleration: The psar max acceleration
+    :type max_acceleration: float
+
+    :rtype: Psar
+    """
+    start = get_historical_start_date(start_date)
+    end = get_end_date(start_date,period)
+
+    if USE_POLYGON == True:
+        stock=get_historical_data_polygon(symbol,start,end)
+    else:
+        stock=get_historical_data_yfinance(symbol,start,end)
+    
+    psar = stock.ta.psar(high=stock['High'], low=stock['Low'], close=stock['Close'],af0=0.02,af=0.02,max_af=0.2)
+    psar.columns = psar.columns.str.replace("_.*$", "", regex=True)
+    psar.rename(columns={"open": "Open", "high": "High", "low": "Low", "close": "Close", "volume": "Volume", "vwap": "Adj Close"}, inplace=True)
+    jsondf = psar.loc[start.date():end.date()]
+    jsondf = jsondf.round(2)
+    jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
+    jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
+
+    output = Psar.from_dict(jsondf.to_dict(orient='records'))
+
+    return output
+
 
 def calculate_sma(symbol, start_date, period, length=5):  # noqa: E501
     """The average price over the specified period
@@ -106,8 +154,15 @@ def calculate_sma(symbol, start_date, period, length=5):  # noqa: E501
     :rtype: Sma
     """
 
+    start = get_historical_start_date(start_date,length)
+    end = get_end_date(start_date,period)
 
-    stock=get_historical_data(symbol, start_date,period,length)
+    if USE_POLYGON == True:
+        stock=get_historical_data_polygon(symbol, start,end)
+    else:
+        stock=get_historical_data_yfinance(symbol,start,end)
+    
+
     sma = stock.ta.sma(close="Close", length=length).dropna()
     outputdf = pd.merge(stock, sma, left_index=True, right_index=True)
     jsondf = outputdf.drop(['Open', 'High', 'Low', 'Adj Close', 'Volume'], axis=1)

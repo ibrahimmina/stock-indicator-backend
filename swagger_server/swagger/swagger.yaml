@@ -66,7 +66,7 @@ paths:
         "401":
           description: API key is missing or invalid
         "404":
-          description: symbol not found
+          description: The specified symbol was not found
         "405":
           description: Validation exception
       x-openapi-router-controller: swagger_server.controllers.general_stock_info_controller
@@ -124,7 +124,7 @@ paths:
         "401":
           description: API key is missing or invalid
         "404":
-          description: symbol not found
+          description: The specified symbol was not found
         "405":
           description: Validation exception
       x-openapi-router-controller: swagger_server.controllers.overlays_controller
@@ -182,7 +182,7 @@ paths:
         "401":
           description: API key is missing or invalid
         "404":
-          description: symbol not found
+          description: The specified symbol was not found
         "405":
           description: Validation exception
       x-openapi-router-controller: swagger_server.controllers.overlays_controller
@@ -251,7 +251,85 @@ paths:
         "401":
           description: API key is missing or invalid
         "404":
-          description: symbol not found
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.overlays_controller
+  /psar:
+    get:
+      tags:
+        - Overlays
+      summary:
+        An oscillator meaning that it operates between or within a set range
+        of numbers or parameters..
+      operationId: calculate_psar
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: initial_acceleration
+          in: query
+          description: The psar initial acceleration
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 0.02
+        - name: acceleration
+          in: query
+          description: The psar acceleration
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 0.02
+        - name: max_acceleration
+          in: query
+          description: The psar max acceleration
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 0.2
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/psar"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
         "405":
           description: Validation exception
       x-openapi-router-controller: swagger_server.controllers.overlays_controller
@@ -411,9 +489,41 @@ components:
         Date:
           - "2023-01-06, 2023-01-07"
           - "2023-01-06, 2023-01-07"
+    psar:
+      type: array
+      items:
+        $ref: "#/components/schemas/psar_inner"
+    psar_inner:
+      type: object
+      properties:
+        Date:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2023-01-06
+        PSARl:
+          type: number
+          example: 145.02
+        PSARs:
+          type: number
+          example: 154.02
+        PSARaf:
+          type: number
+          example: 0.1
+        PSARr:
+          type: integer
+          example: 1
+      example:
+        PSARr: 1
+        PSARs: 154.02
+        PSARl: 145.02
+        PSARaf: 0.1
+        Date: 2023-01-06
   responses:
     UnauthorizedError:
       description: API key is missing or invalid
+    NotFound:
+      description: The specified symbol was not found
   parameters:
     symbol:
       name: symbol
@@ -478,6 +588,36 @@ components:
       schema:
         type: integer
         default: 2
+    initial_acceleration:
+      name: initial_acceleration
+      in: query
+      description: The psar initial acceleration
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+        default: 0.02
+    acceleration:
+      name: acceleration
+      in: query
+      description: The psar acceleration
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+        default: 0.02
+    max_acceleration:
+      name: max_acceleration
+      in: query
+      description: The psar max acceleration
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+        default: 0.2
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
