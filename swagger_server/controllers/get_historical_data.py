@@ -4,18 +4,43 @@ import pandas as pd
 from flask import current_app
 from swagger_server.controllers.date_util import get_end_date, get_historical_start_date
 import yfinance as yf
+from polygon import exceptions as polygon_exceptions
+from swagger_server.exceptions import CustomException
+
 
 polygon_client = RESTClient(api_key=current_app.config['POLYGON_API_KEY'])
 
+
+
+def process_dataframe(df):
+    # Check if the DataFrame is empty
+    if df.empty:
+        raise CustomException(f"The specified symbol was not found",404)
+
 def get_historical_data_polygon(symbol,start,end):
-  stock=pd.DataFrame(polygon_client.get_aggs(ticker=symbol, multiplier=1, timespan="day", from_=start, to=end,sort="asc", limit=50000))
-  stock['Date']=(pd.to_datetime(stock['timestamp'],unit='ms')) 
-  stock['Date'] = pd.to_datetime(stock['Date']).dt.date
-  stock.set_index('Date', inplace=True)
-  stock.drop(['timestamp', 'transactions','otc'], axis=1, inplace=True)
-  stock.rename(columns={"open": "Open", "high": "High", "low": "Low", "close": "Close", "volume": "Volume", "vwap": "Adj Close"}, inplace=True)
-  return stock
+  try:
+    stock=pd.DataFrame(polygon_client.get_aggs(ticker=symbol, multiplier=1, timespan="day", from_=start, to=end,sort="asc", limit=50000))
+    process_dataframe(stock)
+    stock['Date']=(pd.to_datetime(stock['timestamp'],unit='ms')) 
+    stock['Date'] = pd.to_datetime(stock['Date']).dt.date
+    stock.set_index('Date', inplace=True)
+    stock.drop(['timestamp', 'transactions','otc'], axis=1, inplace=True)
+    stock.rename(columns={"open": "Open", "high": "High", "low": "Low", "close": "Close", "volume": "Volume", "vwap": "Adj Close"}, inplace=True)
+    return stock
+  except polygon_exceptions.AuthError as e:
+    # Handle general Polygon.io exceptions
+    raise CustomException(f"Polygon.io exception: {e}",401)
+  except polygon_exceptions.BadResponse as e:
+    # Handle HTTP-related exceptions (e.g., network issues, API rate limits)
+    raise CustomException(f"Polygon.io HTTP exception: {e}",405)
+  except Exception as e:
+    # Handle other unexpected exceptions
+    raise CustomException(f"Unexpected exception: {e}",500)
 
 def get_historical_data_yfinance(symbol,start,end):
-  stock=yf.download(symbol, start=start, end=end)
-  return stock
+  try:
+    stock=yf.download(symbol, start=start, end=end)
+    return stock
+  except Exception as e:
+    print (str(e))
+    raise e

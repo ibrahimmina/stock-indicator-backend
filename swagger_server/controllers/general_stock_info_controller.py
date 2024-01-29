@@ -8,13 +8,16 @@ import pandas as pd
 import pandas_ta as ta
 import yfinance as yf
 from datetime import datetime, timedelta
+from flask import current_app, jsonify
+from swagger_server.exceptions import CustomException
 
-def get_historical_data(symbol,start_date,period):
-    input_start = datetime.strptime(start_date, "%Y-%m-%d")
-    start = input_start
-    end = input_start + timedelta(days=period)
-    stock=yf.download(symbol, start=start, end=end)
-    return stock
+
+from swagger_server.controllers.get_historical_data import get_historical_data_polygon, get_historical_data_yfinance
+from swagger_server.controllers.date_util import get_end_date, get_historical_start_date, get_required_start_date
+
+USE_POLYGON = current_app.config['USE_POLYGON']
+
+
 
 def calculate_candlestick(symbol, start_date, period):  # noqa: E501
     """The average price over the specified period
@@ -31,10 +34,20 @@ def calculate_candlestick(symbol, start_date, period):  # noqa: E501
     :rtype: Candlestick
     """
 
-    stock=get_historical_data(symbol, start_date,period)
+    start = get_required_start_date(start_date)
+    end = get_end_date(start_date,period)
+
+    if USE_POLYGON == True:
+        stock=get_historical_data_polygon(symbol,start,end)
+    else:
+        stock=get_historical_data_yfinance(symbol,start,end)
+
     stock['Date'] = pd.to_datetime(stock.index.astype(str), format='%Y-%M-%d')
     stock['Date'] = stock['Date'].dt.strftime('%Y-%M-%d')
 
+    stock = stock.loc[start.date():end.date()]
+    stock = stock.round(2)
+    
     output = Candlestick(stock['Date'].values.tolist(), stock['Close'].values.tolist(), stock['Open'].values.tolist(), stock['High'].values.tolist(), stock['Low'].values.tolist(),stock['Volume'].values.tolist(), stock['Adj Close'].values.tolist())
 
     return output
