@@ -64,7 +64,10 @@ def calculate_bollinger_bands(symbol, start_date, period, length=5, standard_dev
 
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
 
 def calculate_ema(symbol, start_date, period, length=5):  # noqa: E501
     """The average price over the specified period
@@ -107,7 +110,10 @@ def calculate_ema(symbol, start_date, period, length=5):  # noqa: E501
 
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
 
 def calculate_psar(symbol, start_date, period, initial_acceleration=None, acceleration=None, max_acceleration=None):  # noqa: E501
     """An oscillator meaning that it operates between or within a set range of numbers or parameters..
@@ -152,8 +158,10 @@ def calculate_psar(symbol, start_date, period, initial_acceleration=None, accele
 
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500
-
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
 
 
 def calculate_sma(symbol, start_date, period, length=5):  # noqa: E501
@@ -198,4 +206,7 @@ def calculate_sma(symbol, start_date, period, length=5):  # noqa: E501
 
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500        
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500

@@ -50,20 +50,22 @@ def calculate_cci(symbol, start_date, period, length=14, cci_scaling_constant=0.
         
         cci = stock.ta.cci(high=stock['High'], low=stock['Low'], close=stock['Close'], c=cci_scaling_constant, length=length)
 
-        jsondf = cci.loc[start.date():end_date.date()]
+        jsondf = cci.loc[start.date():end.date()]
         jsondf = jsondf.round(2)
 
         output = jsondf.to_frame()
 
         output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-
+        output.columns = output.columns.str.replace("_.*$", "", regex=True)
 
         output = Cci.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500
-
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
 
 def calculate_efi(symbol, start_date, period, length=13, drift=1):  # noqa: E501
     """Elder&#x27;s Force Index measures the power behind a price movement using price and volume as well as potential reversals and price corrections.
@@ -93,20 +95,22 @@ def calculate_efi(symbol, start_date, period, length=13, drift=1):  # noqa: E501
         
         efi = stock.ta.efi(close=stock['Close'], volume=stock['Volume'], length=length, drift=drift)
 
-        jsondf = efi.loc[start.date():end_date.date()]
+        jsondf = efi.loc[start.date():end.date()]
         jsondf = jsondf.round(2)
 
         output = jsondf.to_frame()
 
         output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-
+        output.columns = output.columns.str.replace("_.*$", "", regex=True)
 
         output = Efi.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500
-
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
 
 def calculate_mfi(symbol, start_date, period, length=14, drift=1):  # noqa: E501
     """The Money Flow Index (MFI) is an oscillator that uses both price and volume to measure buying and selling pressure over a specified period of time.
@@ -136,19 +140,22 @@ def calculate_mfi(symbol, start_date, period, length=14, drift=1):  # noqa: E501
         
         mfi = stock.ta.mfi(high=stock['High'], low=stock['Low'], close=stock['Close'],volume=stock['Volume'], length=length, drift=drift)
 
-        jsondf = mfi.loc[start.date():end_date.date()]
+        jsondf = mfi.loc[start.date():end.date()]
         jsondf = jsondf.round(2)
 
         output = jsondf.to_frame()
 
         output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-
+        output.columns = output.columns.str.replace("_.*$", "", regex=True)
 
         output = Mfi.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
 
 def calculate_obv(symbol, start_date, period):  # noqa: E501
     """The Money Flow Index (MFI) is an oscillator that uses both price and volume to measure buying and selling pressure over a specified period of time.
@@ -177,19 +184,22 @@ def calculate_obv(symbol, start_date, period):  # noqa: E501
         
         obv = stock.ta.obv(close=stock['Close'],volume=stock['Volume'])
 
-        jsondf = obv.loc[start.date():end_date.date()]
+        jsondf = obv.loc[start.date():end.date()]
         jsondf = jsondf.round(2)
 
         output = jsondf.to_frame()
 
         output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-
+        output.columns = output.columns.str.replace("_.*$", "", regex=True)
 
         output = Obv.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
 
 def calculate_roc(symbol, start_date, period, length=1, scalar=100):  # noqa: E501
     """Elder&#x27;s Force Index measures the power behind a price movement using price and volume as well as potential reversals and price corrections.
@@ -219,16 +229,19 @@ def calculate_roc(symbol, start_date, period, length=1, scalar=100):  # noqa: E5
         
         roc = stock.ta.roc(close=stock['Close'],length=length, scalar=scalar)
 
-        jsondf = roc.loc[start.date():end_date.date()]
+        jsondf = roc.loc[start.date():end.date()]
         jsondf = jsondf.round(2)
 
         output = jsondf.to_frame()
 
         output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-
+        output.columns = output.columns.str.replace("_.*$", "", regex=True)
 
         output = Roc.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
-        return jsonify({'error': str(e)}), e.response_code or 500
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
