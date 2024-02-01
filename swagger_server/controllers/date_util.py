@@ -1,6 +1,7 @@
 from flask import current_app
 from datetime import datetime, timedelta, date
 from swagger_server.exceptions import CustomException
+import pandas as pd
 
 def check_date_greater_today(target_date):
     if target_date > datetime.now():

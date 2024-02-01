@@ -17,8 +17,10 @@ from swagger_server.exceptions import CustomException
 
 from swagger_server.controllers.get_historical_data import get_historical_data_polygon, get_historical_data_yfinance
 from swagger_server.controllers.date_util import get_end_date, get_historical_start_date, get_required_start_date
+from swagger_server.controllers.df_util import cleandf
 
 USE_POLYGON = current_app.config['USE_POLYGON']
+
 
 def calculate_cci(symbol, start_date, period, length=14, cci_scaling_constant=0.015):  # noqa: E501
     """Used to help determine when an investment vehicle is reaching a condition of being overbought or oversold.
@@ -50,15 +52,10 @@ def calculate_cci(symbol, start_date, period, length=14, cci_scaling_constant=0.
         
         cci = stock.ta.cci(high=stock['High'], low=stock['Low'], close=stock['Close'], c=cci_scaling_constant, length=length)
 
-        jsondf = cci.loc[start.date():end.date()]
-        jsondf = jsondf.round(2)
-
-        output = jsondf.to_frame()
-
-        output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
-        output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-        output.columns = output.columns.str.replace("_.*$", "", regex=True)
-
+        df = cci.to_frame()
+        
+        output = cleandf(df, required_start, end, 2,"_.*$","%Y-%M-%d")
+        
         output = Cci.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
@@ -95,14 +92,9 @@ def calculate_efi(symbol, start_date, period, length=13, drift=1):  # noqa: E501
         
         efi = stock.ta.efi(close=stock['Close'], volume=stock['Volume'], length=length, drift=drift)
 
-        jsondf = efi.loc[start.date():end.date()]
-        jsondf = jsondf.round(2)
+        df = efi.to_frame()
 
-        output = jsondf.to_frame()
-
-        output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
-        output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-        output.columns = output.columns.str.replace("_.*$", "", regex=True)
+        output = cleandf(df, required_start, end, 2,"_.*$","%Y-%M-%d")
 
         output = Efi.from_dict(output.to_dict(orient='records'))
         return output
@@ -140,14 +132,8 @@ def calculate_mfi(symbol, start_date, period, length=14, drift=1):  # noqa: E501
         
         mfi = stock.ta.mfi(high=stock['High'], low=stock['Low'], close=stock['Close'],volume=stock['Volume'], length=length, drift=drift)
 
-        jsondf = mfi.loc[start.date():end.date()]
-        jsondf = jsondf.round(2)
-
-        output = jsondf.to_frame()
-
-        output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
-        output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-        output.columns = output.columns.str.replace("_.*$", "", regex=True)
+        df = mfi.to_frame()
+        output = cleandf(df, required_start, end, 2,"_.*$","%Y-%M-%d")
 
         output = Mfi.from_dict(output.to_dict(orient='records'))
         return output
@@ -184,14 +170,10 @@ def calculate_obv(symbol, start_date, period):  # noqa: E501
         
         obv = stock.ta.obv(close=stock['Close'],volume=stock['Volume'])
 
-        jsondf = obv.loc[start.date():end.date()]
-        jsondf = jsondf.round(2)
+        df = obv.to_frame()
 
-        output = jsondf.to_frame()
-
-        output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
-        output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-        output.columns = output.columns.str.replace("_.*$", "", regex=True)
+        output = cleandf(df, required_start, end, 2,"_.*$","%Y-%M-%d")
+        
 
         output = Obv.from_dict(output.to_dict(orient='records'))
         return output
@@ -229,14 +211,9 @@ def calculate_roc(symbol, start_date, period, length=1, scalar=100):  # noqa: E5
         
         roc = stock.ta.roc(close=stock['Close'],length=length, scalar=scalar)
 
-        jsondf = roc.loc[start.date():end.date()]
-        jsondf = jsondf.round(2)
+        df = roc.to_frame()
 
-        output = jsondf.to_frame()
-
-        output['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
-        output['Date'] = output['Date'].dt.strftime('%Y-%M-%d')
-        output.columns = output.columns.str.replace("_.*$", "", regex=True)
+        output = cleandf(df, required_start, end, 2,"_.*$","%Y-%M-%d")
 
         output = Roc.from_dict(output.to_dict(orient='records'))
         return output
