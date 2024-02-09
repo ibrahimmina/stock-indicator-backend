@@ -1,6 +1,8 @@
 from typing import List
 from connexion.exceptions import OAuthProblem
 from flask import current_app
+from polygon import exceptions as polygon_exceptions
+from swagger_server.exceptions import CustomException
 
 """
 controller generated to handled auth operation described at:
@@ -18,5 +20,3 @@ def check_ApiKeyAuth(api_key, required_scopes):
         raise OAuthProblem("Invalid token")
 
     return info
-
-

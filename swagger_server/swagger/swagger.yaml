@@ -6,61 +6,63 @@ info:
     The API is to be consumed by the frontend team to display the charts required for the stock analysis and indicators
   version: 0.0.1
 servers:
-- url: http://3.84.200.180/
+  - url: http://3.84.200.180/
 security:
-- ApiKeyAuth: []
+  - ApiKeyAuth: []
 tags:
-- name: GeneralStockInfo
-  description: Provide Candle stick data and general stock information
-- name: Overlays
-  description: Technical indicators that use the same scale as prices are plotted
-    over the top of the prices on a stock chart.
-- name: Oscillators
-  description: Technical indicators that oscillate between a local minimum and maximum
-    are plotted above or below a price chart.
+  - name: GeneralStockInfo
+    description: Provide Candle stick data and general stock information
+  - name: Overlays
+    description:
+      Technical indicators that use the same scale as prices are plotted
+      over the top of the prices on a stock chart.
+  - name: Oscillators
+    description:
+      Technical indicators that oscillate between a local minimum and maximum
+      are plotted above or below a price chart.
 paths:
   /candlestick:
     get:
       tags:
-      - GeneralStockInfo
+        - GeneralStockInfo
       summary: The average price over the specified period
       operationId: calculate_candlestick
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/candlestick'
+                $ref: "#/components/schemas/candlestick"
         "401":
           description: API key is missing or invalid
         "404":
@@ -68,57 +70,108 @@ paths:
         "405":
           description: Validation exception
       x-openapi-router-controller: swagger_server.controllers.general_stock_info_controller
-  /sma:
+  /adl:
     get:
       tags:
-      - Overlays
-      summary: The average price over the specified period
-      operationId: calculate_sma
+        - Overlays
+      summary:
+        Accumulation/Distribution indicator utilizes the relative position
+        of the close to it's High-Low range with volume.  Then it is cumulated.
+      operationId: calculate_adl
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: length
-        in: query
-        description: The short period
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-          default: 5
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/sma'
+                $ref: "#/components/schemas/adl"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.overlays_controller
+  /sma:
+    get:
+      tags:
+        - Overlays
+      summary: The average price over the specified period
+      operationId: calculate_sma
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: The short period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/sma"
         "401":
           description: API key is missing or invalid
         "404":
@@ -129,54 +182,54 @@ paths:
   /ema:
     get:
       tags:
-      - Overlays
+        - Overlays
       summary: The average price over the specified period
       operationId: calculate_ema
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: length
-        in: query
-        description: The short period
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-          default: 5
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: The short period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 5
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ema'
+                $ref: "#/components/schemas/ema"
         "401":
           description: API key is missing or invalid
         "404":
@@ -187,64 +240,65 @@ paths:
   /bollinger:
     get:
       tags:
-      - Overlays
-      summary: An oscillator meaning that it operates between or within a set range
+        - Overlays
+      summary:
+        An oscillator meaning that it operates between or within a set range
         of numbers or parameters..
       operationId: calculate_bollinger_bands
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: length
-        in: query
-        description: The short period
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-          default: 5
-      - name: standard_deviation
-        in: query
-        description: The long period
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: integer
-          default: 2
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: The short period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 5
+        - name: standard_deviation
+          in: query
+          description: The long period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 2
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/bollinger'
+                $ref: "#/components/schemas/bollinger"
         "401":
           description: API key is missing or invalid
         "404":
@@ -252,144 +306,483 @@ paths:
         "405":
           description: Validation exception
       x-openapi-router-controller: swagger_server.controllers.overlays_controller
+  /adx:
+    get:
+      tags:
+        - Overlays
+      summary:
+        Average Directional Movement is meant to quantify trend strength by
+        measuring the amount of movement in a single direction.
+      operationId: calculate_adx
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: period length
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 14
+        - name: scalar
+          in: query
+          description: How much to magnify
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 100
+        - name: drift
+          in: query
+          description: diff period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 1
+        - name: lensig
+          in: query
+          description: Signal Length
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 14
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/adx"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.overlays_controller
+  /macd:
+    get:
+      tags:
+        - Oscillators
+      summary:
+        "The MACD is a popular indicator to that is used to identify a security's\
+        \ trend. While APO and MACD are the same calculation, MACD also returns two\
+        \ more series called Signal and Histogram. The Signal is an EMA of MACD and\
+        \ the Histogram is the difference of MACD and Signal."
+      operationId: calculate_macd
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: fast
+          in: query
+          description: The short period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 12
+        - name: slow
+          in: query
+          description: The long period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 26
+        - name: signal
+          in: query
+          description: The signal period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 9
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/macd"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.oscillators_controller
+  /ppo:
+    get:
+      tags:
+        - Oscillators
+      summary: The Percentage Price Oscillator is similar to MACD in measuring momentum.
+      operationId: calculate_ppo
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: fast
+          in: query
+          description: The short period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 12
+        - name: slow
+          in: query
+          description: The long period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 26
+        - name: signal
+          in: query
+          description: The signal period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 9
+        - name: scalar
+          in: query
+          description: How much to magnify
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 100
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ppo"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.oscillators_controller
+  /pvo:
+    get:
+      tags:
+        - Oscillators
+      summary: Percentage Volume Oscillator is a Momentum Oscillator for Volume.
+      operationId: calculate_pvo
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: fast
+          in: query
+          description: The short period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 12
+        - name: slow
+          in: query
+          description: The long period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 26
+        - name: signal
+          in: query
+          description: The signal period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 9
+        - name: scalar
+          in: query
+          description: How much to magnify
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 100
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/pvo"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.oscillators_controller
   /psar:
     get:
       tags:
-      - Overlays
-      summary: An oscillator meaning that it operates between or within a set range
+        - Oscillators
+      summary:
+        An oscillator meaning that it operates between or within a set range
         of numbers or parameters..
       operationId: calculate_psar
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: initial_acceleration
-        in: query
-        description: The psar initial acceleration
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 0.02
-      - name: acceleration
-        in: query
-        description: The psar acceleration
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 0.02
-      - name: max_acceleration
-        in: query
-        description: The psar max acceleration
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 0.2
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: initial_acceleration
+          in: query
+          description: The psar initial acceleration
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 0.02
+        - name: acceleration
+          in: query
+          description: The psar acceleration
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 0.02
+        - name: max_acceleration
+          in: query
+          description: The psar max acceleration
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 0.2
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/psar'
+                $ref: "#/components/schemas/psar"
         "401":
           description: API key is missing or invalid
         "404":
           description: The specified symbol was not found
         "405":
           description: Validation exception
-      x-openapi-router-controller: swagger_server.controllers.overlays_controller
+      x-openapi-router-controller: swagger_server.controllers.oscillators_controller
   /cci:
     get:
       tags:
-      - Oscillators
-      summary: Used to help determine when an investment vehicle is reaching a condition
+        - Oscillators
+      summary:
+        Used to help determine when an investment vehicle is reaching a condition
         of being overbought or oversold.
       operationId: calculate_cci
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: length
-        in: query
-        description: period length
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 14
-      - name: cci_scaling_constant
-        in: query
-        description: scaling constant
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 0.015
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: period length
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 14
+        - name: cci_scaling_constant
+          in: query
+          description: scaling constant
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 0.015
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/cci'
+                $ref: "#/components/schemas/cci"
         "401":
           description: API key is missing or invalid
         "404":
@@ -400,64 +793,65 @@ paths:
   /mfi:
     get:
       tags:
-      - Oscillators
-      summary: The Money Flow Index (MFI) is an oscillator that uses both price and
+        - Oscillators
+      summary:
+        The Money Flow Index (MFI) is an oscillator that uses both price and
         volume to measure buying and selling pressure over a specified period of time.
       operationId: calculate_mfi
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: length
-        in: query
-        description: period length
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 14
-      - name: drift
-        in: query
-        description: diff period
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 1
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: period length
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 14
+        - name: drift
+          in: query
+          description: diff period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 1
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/mfi'
+                $ref: "#/components/schemas/mfi"
         "401":
           description: API key is missing or invalid
         "404":
@@ -468,46 +862,47 @@ paths:
   /obv:
     get:
       tags:
-      - Oscillators
-      summary: The Money Flow Index (MFI) is an oscillator that uses both price and
+        - Oscillators
+      summary:
+        The Money Flow Index (MFI) is an oscillator that uses both price and
         volume to measure buying and selling pressure over a specified period of time.
       operationId: calculate_obv
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/obv'
+                $ref: "#/components/schemas/obv"
         "401":
           description: API key is missing or invalid
         "404":
@@ -518,64 +913,65 @@ paths:
   /roc:
     get:
       tags:
-      - Oscillators
-      summary: Elder's Force Index measures the power behind a price movement using
+        - Oscillators
+      summary:
+        Elder's Force Index measures the power behind a price movement using
         price and volume as well as potential reversals and price corrections.
       operationId: calculate_roc
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: length
-        in: query
-        description: period length
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 1
-      - name: scalar
-        in: query
-        description: How much to magnify
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 100
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: period length
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 1
+        - name: scalar
+          in: query
+          description: How much to magnify
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 100
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/roc'
+                $ref: "#/components/schemas/roc"
         "401":
           description: API key is missing or invalid
         "404":
@@ -586,64 +982,125 @@ paths:
   /efi:
     get:
       tags:
-      - Oscillators
-      summary: Elder's Force Index measures the power behind a price movement using
+        - Oscillators
+      summary:
+        Elder's Force Index measures the power behind a price movement using
         price and volume as well as potential reversals and price corrections.
       operationId: calculate_efi
       parameters:
-      - name: symbol
-        in: query
-        description: Ticker Symbol Required
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
-      - name: start_date
-        in: query
-        description: Start Date of Analysis in YYYY-MM-DD Format
-        required: true
-        style: form
-        explode: true
-        schema:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-          type: string
-          format: Date
-          example: 2019-05-17T00:00:00.000Z
-      - name: period
-        in: query
-        description: The Analysis Period in Days from Start Date
-        required: true
-        style: form
-        explode: true
-        schema:
-          minimum: 1
-          type: integer
-      - name: length
-        in: query
-        description: period length
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 13
-      - name: drift
-        in: query
-        description: diff period
-        required: false
-        style: form
-        explode: true
-        schema:
-          type: number
-          default: 1
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: period length
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 13
+        - name: drift
+          in: query
+          description: diff period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 1
       responses:
         "200":
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/efi'
+                $ref: "#/components/schemas/efi"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.oscillators_controller
+  /cmf:
+    get:
+      tags:
+        - Oscillators
+      summary:
+        Chailin Money Flow measures the amount of money flow volume over a
+        specific period in conjunction with Accumulation/Distribution.
+      operationId: calculate_cmf
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Start Date of Analysis in YYYY-MM-DD Format
+          required: true
+          style: form
+          explode: true
+          schema:
+            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: 2019-05-17T00:00:00.000Z
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            minimum: 1
+            type: integer
+        - name: length
+          in: query
+          description: period length
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 20
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/cmf"
         "401":
           description: API key is missing or invalid
         "404":
@@ -689,26 +1146,26 @@ components:
             type: number
       example:
         Close:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         Open:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         High:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         Low:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         Volume:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         AdjClose:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         Date:
-        - "2023-01-06, 2023-01-07"
-        - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
     sma:
       type: object
       properties:
@@ -729,14 +1186,14 @@ components:
             type: number
       example:
         SMA:
-        - 6.027
-        - 6.027
+          - 6.027
+          - 6.027
         Close:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         Date:
-        - "2023-01-06, 2023-01-07"
-        - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
     ema:
       type: object
       properties:
@@ -757,14 +1214,14 @@ components:
             type: number
       example:
         EMA:
-        - 6.027
-        - 6.027
+          - 6.027
+          - 6.027
         Close:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         Date:
-        - "2023-01-06, 2023-01-07"
-        - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
     bollinger:
       type: object
       properties:
@@ -793,48 +1250,68 @@ components:
             type: number
       example:
         BBU:
-        - 1.46
-        - 1.46
+          - 1.46
+          - 1.46
         Close:
-        - 5.96
-        - 5.96
+          - 5.96
+          - 5.96
         BBM:
-        - 6.027
-        - 6.02
+          - 6.027
+          - 6.02
         BBL:
-        - 0.8
-        - 0.8
+          - 0.8
+          - 0.8
         Date:
-        - "2023-01-06, 2023-01-07"
-        - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
     psar:
       type: array
       items:
-        $ref: '#/components/schemas/psar_inner'
+        $ref: "#/components/schemas/psar_inner"
+    adx:
+      type: array
+      items:
+        $ref: "#/components/schemas/adx_inner"
     cci:
       type: array
       items:
-        $ref: '#/components/schemas/cci_inner'
+        $ref: "#/components/schemas/cci_inner"
     cmf:
       type: array
       items:
-        $ref: '#/components/schemas/cmf_inner'
+        $ref: "#/components/schemas/cmf_inner"
     roc:
       type: array
       items:
-        $ref: '#/components/schemas/roc_inner'
+        $ref: "#/components/schemas/roc_inner"
     efi:
       type: array
       items:
-        $ref: '#/components/schemas/efi_inner'
+        $ref: "#/components/schemas/efi_inner"
     mfi:
       type: array
       items:
-        $ref: '#/components/schemas/mfi_inner'
+        $ref: "#/components/schemas/mfi_inner"
     obv:
       type: array
       items:
-        $ref: '#/components/schemas/obv_inner'
+        $ref: "#/components/schemas/obv_inner"
+    adl:
+      type: array
+      items:
+        $ref: "#/components/schemas/adl_inner"
+    ppo:
+      type: array
+      items:
+        $ref: "#/components/schemas/ppo_inner"
+    pvo:
+      type: array
+      items:
+        $ref: "#/components/schemas/pvo_inner"
+    macd:
+      type: array
+      items:
+        $ref: "#/components/schemas/macd_inner"
     psar_inner:
       type: object
       properties:
@@ -842,7 +1319,7 @@ components:
           pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
           type: string
           format: Date
-          example: 2023-01-06
+          example: 2023-01-06T00:00:00.000Z
         PSARl:
           type: number
           example: 145.02
@@ -860,7 +1337,95 @@ components:
         PSARs: 154.02
         PSARl: 145.02
         PSARaf: 0.1
-        Date: 2023-01-06
+        Date: 2023-01-06T00:00:00.000Z
+    adx_inner:
+      type: object
+      properties:
+        Date:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2023-01-06T00:00:00.000Z
+        ADX:
+          type: number
+          example: 145.02
+        DMX:
+          type: number
+          example: 154.02
+        DMN:
+          type: number
+          example: 0.1
+      example:
+        ADX: 1
+        DMX: 154.02
+        DMN: 145.02
+        Date: 2023-01-06T00:00:00.000Z
+    macd_inner:
+      type: object
+      properties:
+        Date:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2023-01-06T00:00:00.000Z
+        MACD:
+          type: number
+          example: 145.02
+        MACDh:
+          type: number
+          example: 154.02
+        MACDs:
+          type: number
+          example: 0.1
+      example:
+        MACD: 1
+        HIST: 154.02
+        SIG: 145.02
+        Date: 2023-01-06T00:00:00.000Z
+    ppo_inner:
+      type: object
+      properties:
+        Date:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2023-01-06T00:00:00.000Z
+        PPO:
+          type: number
+          example: 145.02
+        HIST:
+          type: number
+          example: 154.02
+        SIG:
+          type: number
+          example: 0.1
+      example:
+        PPO: 1
+        HIST: 154.02
+        SIG: 145.02
+        Date: 2023-01-06T00:00:00.000Z
+    pvo_inner:
+      type: object
+      properties:
+        Date:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2023-01-06T00:00:00.000Z
+        PVO:
+          type: number
+          example: 145.02
+        HIST:
+          type: number
+          example: 154.02
+        SIG:
+          type: number
+          example: 0.1
+      example:
+        PVO: 1
+        HIST: 154.02
+        SIG: 145.02
+        Date: 2023-01-06T00:00:00.000Z
     cci_inner:
       type: object
       properties:
@@ -868,13 +1433,13 @@ components:
           pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
           type: string
           format: Date
-          example: 2023-01-06
+          example: 2023-01-06T00:00:00.000Z
         cci:
           type: number
           example: 145.02
       example:
         cci: 145.02
-        Date: 2023-01-06
+        Date: 2023-01-06T00:00:00.000Z
     cmf_inner:
       type: object
       properties:
@@ -882,10 +1447,13 @@ components:
           pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
           type: string
           format: Date
-          example: 2023-01-06
+          example: 2023-01-06T00:00:00.000Z
         cmf:
           type: number
           example: 145.02
+      example:
+        cmf: 145.02
+        Date: 2023-01-06T00:00:00.000Z
     roc_inner:
       type: object
       properties:
@@ -893,13 +1461,13 @@ components:
           pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
           type: string
           format: Date
-          example: 2023-01-06
+          example: 2023-01-06T00:00:00.000Z
         roc:
           type: number
           example: 145.02
       example:
         roc: 145.02
-        Date: 2023-01-06
+        Date: 2023-01-06T00:00:00.000Z
     efi_inner:
       type: object
       properties:
@@ -907,13 +1475,13 @@ components:
           pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
           type: string
           format: Date
-          example: 2023-01-06
+          example: 2023-01-06T00:00:00.000Z
         efi:
           type: number
           example: 145.02
       example:
         efi: 145.02
-        Date: 2023-01-06
+        Date: 2023-01-06T00:00:00.000Z
     mfi_inner:
       type: object
       properties:
@@ -921,13 +1489,13 @@ components:
           pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
           type: string
           format: Date
-          example: 2023-01-06
+          example: 2023-01-06T00:00:00.000Z
         mfi:
           type: number
           example: 145.02
       example:
         mfi: 145.02
-        Date: 2023-01-06
+        Date: 2023-01-06T00:00:00.000Z
     obv_inner:
       type: object
       properties:
@@ -935,13 +1503,27 @@ components:
           pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
           type: string
           format: Date
-          example: 2023-01-06
+          example: 2023-01-06T00:00:00.000Z
         obv:
           type: number
           example: 145.02
       example:
         obv: 145.02
-        Date: 2023-01-06
+        Date: 2023-01-06T00:00:00.000Z
+    adl_inner:
+      type: object
+      properties:
+        Date:
+          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+          type: string
+          format: Date
+          example: 2023-01-06T00:00:00.000Z
+        adl:
+          type: number
+          example: 145.02
+      example:
+        adl: 145.02
+        Date: 2023-01-06T00:00:00.000Z
   responses:
     UnauthorizedError:
       description: API key is missing or invalid
@@ -1061,6 +1643,16 @@ components:
       schema:
         type: number
         default: 14
+    length_default_20:
+      name: length
+      in: query
+      description: period length
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+        default: 20
     length_default_13:
       name: length
       in: query
@@ -1101,10 +1693,49 @@ components:
       schema:
         type: number
         default: 100
+    lensig:
+      name: lensig
+      in: query
+      description: Signal Length
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+        default: 14
+    fast:
+      name: fast
+      in: query
+      description: The short period
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+        default: 12
+    slow:
+      name: slow
+      in: query
+      description: The long period
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+        default: 26
+    signal:
+      name: signal
+      in: query
+      description: The signal period
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: number
+        default: 9
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
       name: X-API-KEY
       in: header
       x-apikeyInfoFunc: swagger_server.controllers.authorization_controller.check_ApiKeyAuth
-

@@ -33,21 +33,27 @@ def calculate_candlestick(symbol, start_date, period):  # noqa: E501
 
     :rtype: Candlestick
     """
+    try:
+        start = get_required_start_date(start_date)
+        end = get_end_date(start_date,period)
 
-    start = get_required_start_date(start_date)
-    end = get_end_date(start_date,period)
+        if USE_POLYGON == True:
+            stock=get_historical_data_polygon(symbol,start,end)
+        else:
+            stock=get_historical_data_yfinance(symbol,start,end)
+        
+        stock['Date'] = pd.to_datetime(stock.index.astype(str), format='%Y-%M-%d')
+        stock['Date'] = stock['Date'].dt.strftime('%Y-%M-%d')
 
-    if USE_POLYGON == True:
-        stock=get_historical_data_polygon(symbol,start,end)
-    else:
-        stock=get_historical_data_yfinance(symbol,start,end)
+        stock = stock.loc[start.date():end.date()]
+        stock = stock.round(2)
+        
+        output = Candlestick(stock['Date'].values.tolist(), stock['Close'].values.tolist(), stock['Open'].values.tolist(), stock['High'].values.tolist(), stock['Low'].values.tolist(),stock['Volume'].values.tolist(), stock['Adj Close'].values.tolist())
 
-    stock['Date'] = pd.to_datetime(stock.index.astype(str), format='%Y-%M-%d')
-    stock['Date'] = stock['Date'].dt.strftime('%Y-%M-%d')
-
-    stock = stock.loc[start.date():end.date()]
-    stock = stock.round(2)
-    
-    output = Candlestick(stock['Date'].values.tolist(), stock['Close'].values.tolist(), stock['Open'].values.tolist(), stock['High'].values.tolist(), stock['Low'].values.tolist(),stock['Volume'].values.tolist(), stock['Adj Close'].values.tolist())
-
-    return output
+        return output
+    except Exception as e:
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            print("No Attr")
+            return jsonify({'error': str(e)}), 500

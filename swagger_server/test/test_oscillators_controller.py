@@ -6,9 +6,14 @@ from flask import json
 from six import BytesIO
 
 from swagger_server.models.cci import Cci  # noqa: E501
+from swagger_server.models.cmf import Cmf  # noqa: E501
 from swagger_server.models.efi import Efi  # noqa: E501
+from swagger_server.models.macd import Macd  # noqa: E501
 from swagger_server.models.mfi import Mfi  # noqa: E501
 from swagger_server.models.obv import Obv  # noqa: E501
+from swagger_server.models.ppo import Ppo  # noqa: E501
+from swagger_server.models.psar import Psar  # noqa: E501
+from swagger_server.models.pvo import Pvo  # noqa: E501
 from swagger_server.models.roc import Roc  # noqa: E501
 from swagger_server.test import BaseTestCase
 
@@ -33,6 +38,22 @@ class TestOscillatorsController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_calculate_cmf(self):
+        """Test case for calculate_cmf
+
+        Chailin Money Flow measures the amount of money flow volume over a specific period in conjunction with Accumulation/Distribution.
+        """
+        query_string = [('symbol', 'symbol_example'),
+                        ('start_date', 'start_date_example'),
+                        ('period', 2),
+                        ('length', 20)]
+        response = self.client.open(
+            '//cmf',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_calculate_efi(self):
         """Test case for calculate_efi
 
@@ -41,9 +62,28 @@ class TestOscillatorsController(BaseTestCase):
         query_string = [('symbol', 'symbol_example'),
                         ('start_date', 'start_date_example'),
                         ('period', 2),
-                        ('length', 1)]
+                        ('length', 13),
+                        ('drift', 1)]
         response = self.client.open(
             '//efi',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_calculate_macd(self):
+        """Test case for calculate_macd
+
+        The MACD is a popular indicator to that is used to identify a security's trend. While APO and MACD are the same calculation, MACD also returns two more series called Signal and Histogram. The Signal is an EMA of MACD and the Histogram is the difference of MACD and Signal.
+        """
+        query_string = [('symbol', 'symbol_example'),
+                        ('start_date', 'start_date_example'),
+                        ('period', 2),
+                        ('fast', 12),
+                        ('slow', 26),
+                        ('signal', 9)]
+        response = self.client.open(
+            '//macd',
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -57,7 +97,8 @@ class TestOscillatorsController(BaseTestCase):
         query_string = [('symbol', 'symbol_example'),
                         ('start_date', 'start_date_example'),
                         ('period', 2),
-                        ('length', 1)]
+                        ('length', 14),
+                        ('drift', 1)]
         response = self.client.open(
             '//mfi',
             method='GET',
@@ -80,6 +121,62 @@ class TestOscillatorsController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_calculate_ppo(self):
+        """Test case for calculate_ppo
+
+        The Percentage Price Oscillator is similar to MACD in measuring momentum.
+        """
+        query_string = [('symbol', 'symbol_example'),
+                        ('start_date', 'start_date_example'),
+                        ('period', 2),
+                        ('fast', 12),
+                        ('slow', 26),
+                        ('signal', 9),
+                        ('scalar', 100)]
+        response = self.client.open(
+            '//ppo',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_calculate_psar(self):
+        """Test case for calculate_psar
+
+        An oscillator meaning that it operates between or within a set range of numbers or parameters..
+        """
+        query_string = [('symbol', 'symbol_example'),
+                        ('start_date', 'start_date_example'),
+                        ('period', 2),
+                        ('initial_acceleration', 0.02),
+                        ('acceleration', 0.02),
+                        ('max_acceleration', 0.2)]
+        response = self.client.open(
+            '//psar',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_calculate_pvo(self):
+        """Test case for calculate_pvo
+
+        Percentage Volume Oscillator is a Momentum Oscillator for Volume.
+        """
+        query_string = [('symbol', 'symbol_example'),
+                        ('start_date', 'start_date_example'),
+                        ('period', 2),
+                        ('fast', 12),
+                        ('slow', 26),
+                        ('signal', 9),
+                        ('scalar', 100)]
+        response = self.client.open(
+            '//pvo',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
     def test_calculate_roc(self):
         """Test case for calculate_roc
 
@@ -88,7 +185,8 @@ class TestOscillatorsController(BaseTestCase):
         query_string = [('symbol', 'symbol_example'),
                         ('start_date', 'start_date_example'),
                         ('period', 2),
-                        ('length', 100)]
+                        ('length', 1),
+                        ('scalar', 100)]
         response = self.client.open(
             '//roc',
             method='GET',
