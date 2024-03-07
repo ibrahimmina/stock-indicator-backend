@@ -70,6 +70,44 @@ paths:
         "405":
           description: Validation exception
       x-openapi-router-controller: swagger_server.controllers.general_stock_info_controller
+  /candlesticknew:
+    get:
+      tags:
+        - GeneralStockInfo
+      summary: The average price over the specified period
+      operationId: calculate_candlestick_updated
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/candlestick"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.general_stock_info_controller
+
   /adl:
     get:
       tags:
@@ -299,6 +337,63 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/bollinger"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.overlays_controller
+  /bollingernew:
+    get:
+      tags:
+        - Overlays
+      summary:
+        An oscillator meaning that it operates between or within a set range
+        of numbers or parameters..
+      operationId: calculate_bollinger_bands_updated
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          description: The Analysis Period in Days from Start Date
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: length
+          in: query
+          description: The short period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 5
+        - name: standard_deviation
+          in: query
+          description: The long period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 2
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/bollingernew"
         "401":
           description: API key is missing or invalid
         "404":
@@ -1116,7 +1211,6 @@ components:
         Date:
           type: array
           items:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
             type: string
             format: Date
             example: "2023-01-06, 2023-01-07"
@@ -1229,6 +1323,47 @@ components:
           type: array
           items:
             pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+            type: string
+            format: Date
+            example: "2023-01-06, 2023-01-07"
+        BBL:
+          type: array
+          items:
+            type: number
+        BBM:
+          type: array
+          items:
+            type: number
+        BBU:
+          type: array
+          items:
+            type: number
+        Close:
+          type: array
+          items:
+            type: number
+      example:
+        BBU:
+          - 1.46
+          - 1.46
+        Close:
+          - 5.96
+          - 5.96
+        BBM:
+          - 6.027
+          - 6.02
+        BBL:
+          - 0.8
+          - 0.8
+        Date:
+          - "2023-01-06, 2023-01-07"
+          - "2023-01-06, 2023-01-07"
+    bollingernew:
+      type: object
+      properties:
+        Date:
+          type: array
+          items:
             type: string
             format: Date
             example: "2023-01-06, 2023-01-07"

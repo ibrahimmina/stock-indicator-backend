@@ -17,8 +17,8 @@ from flask import current_app, jsonify
 from swagger_server.exceptions import CustomException
 
 
-from swagger_server.controllers.get_historical_data import get_historical_data_polygon, get_historical_data_yfinance
-from swagger_server.controllers.date_util import get_end_date, get_historical_start_date, get_required_start_date
+from swagger_server.controllers.get_historical_data import get_historical_data_polygon, get_historical_data_yfinance, get_historical_data_polygon_updated
+from swagger_server.controllers.date_util import get_end_date, get_historical_start_date, get_required_start_date, process_period
 
 USE_POLYGON = current_app.config['USE_POLYGON']
 
@@ -103,6 +103,53 @@ def calculate_bollinger_bands(symbol, start_date, period, length=5, standard_dev
         bbands['Date'] = bbands['Date'].dt.strftime('%Y-%M-%d')
 
         output = Bollinger(bbands['Date'].values.tolist(), bbands['BBL'].values.tolist(), bbands['BBM'].values.tolist(), bbands['BBU'].values.tolist(), bbands['Close'].values.tolist())
+
+        return output
+    except Exception as e:
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
+
+def calculate_bollinger_bands_updated(symbol, period, length=5, standard_deviation=2):  # noqa: E501
+    """An oscillator meaning that it operates between or within a set range of numbers or parameters..
+
+     # noqa: E501
+
+    :param symbol: Ticker Symbol Required
+    :type symbol: str
+    :param start_date: Start Date of Analysis in YYYY-MM-DD Format
+    :type start_date: str
+    :param period: The Analysis Period in Days from Start Date
+    :type period: int
+    :param length: The short period
+    :type length: int
+    :param standard_deviation: The long period
+    :type standard_deviation: int
+
+    :rtype: Bollinger
+    """
+    try:
+
+        back_period = process_period(period)
+        start=datetime.now() - timedelta(days=back_period+current_app.config['BACK_PERIOD'])
+        required_start = datetime.now() - timedelta(days=back_period+current_app.config['BACK_PERIOD'])
+        end=datetime.now()
+
+        if USE_POLYGON == True:
+            stock=get_historical_data_polygon_updated(symbol,start,end, period)
+        else:
+            stock=get_historical_data_yfinance(symbol,start,end)
+        
+        bbands = stock.ta.bbands(close="Close", std=standard_deviation, length=length).dropna()
+        bbands = pd.merge(stock, bbands, left_index=True, right_index=True)
+        bbands.columns = bbands.columns.str.replace("_*.\d", "", regex=True)
+        bbands = bbands.drop(['BBB', 'BBP','Open', 'High', 'Low', 'Adj Close', 'Volume'], axis=1)
+        
+        bbands = bbands.loc[required_start.date():end.date()]
+        bbands = bbands.round(2)
+
+        output = Bollinger(bbands['timestamp'].values.tolist(), bbands['BBL'].values.tolist(), bbands['BBM'].values.tolist(), bbands['BBU'].values.tolist(), bbands['Close'].values.tolist())
 
         return output
     except Exception as e:

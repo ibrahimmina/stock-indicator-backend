@@ -25,3 +25,10 @@ def get_required_start_date(start_date,length=0):
     check_date_greater_today(input_start)
     start = input_start
     return start
+
+def process_period(period):
+    # Check if the DataFrame is empty
+    if period not in current_app.config['PERIOD_DICT']:
+        raise CustomException(f"The specified period is not configured",404)
+    else:
+      return current_app.config['PERIOD_DICT'][period]
