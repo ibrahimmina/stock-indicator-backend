@@ -18,11 +18,12 @@ from swagger_server.exceptions import CustomException
 
 
 from swagger_server.controllers.get_historical_data import get_historical_data_polygon, get_historical_data_yfinance, get_historical_data_polygon_updated
-from swagger_server.controllers.date_util import get_end_date, get_historical_start_date, get_required_start_date, process_period
+from swagger_server.controllers.date_util import get_end_date, get_historical_start_date, get_required_start_date, process_period, get_start_dates
+from swagger_server.controllers.df_util import cleandfupdated
 
 USE_POLYGON = current_app.config['USE_POLYGON']
 
-def calculate_adl(symbol, start_date, period):  # noqa: E501
+def calculate_adl(symbol, period):  # noqa: E501
     """Accumulation/Distribution indicator utilizes the relative position of the close to it&#x27;s High-Low range with volume.  Then it is cumulated.
 
      # noqa: E501
@@ -36,10 +37,29 @@ def calculate_adl(symbol, start_date, period):  # noqa: E501
 
     :rtype: Adl
     """
-    return 'do some magic!'
+    try:
+        end = get_end_date()
+        start, required_start = get_start_dates(period)
 
+        if USE_POLYGON == True:
+            stock=get_historical_data_polygon_updated(symbol,start,end, period)
+        else:
+            stock=get_historical_data_yfinance(symbol,start,end)
+        
+        adl = stock.ta.ad(high=stock['High'], low=stock['Low'], close=stock['Close'], volume=stock['Volume'])
+        
+        output = cleandfupdated(adl,stock, required_start, end, 2,"_.*$")
 
-def calculate_adx(symbol, start_date, period, length=None, scalar=None, drift=None, lensig=None):  # noqa: E501
+        output = Adl.from_dict(output.to_dict(orient='records'))
+        
+        return output
+    except Exception as e:
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
+
+def calculate_adx(symbol, period, length=None, scalar=None, drift=None, lensig=None):  # noqa: E501
     """Average Directional Movement is meant to quantify trend strength by measuring the amount of movement in a single direction.
 
      # noqa: E501
@@ -61,7 +81,28 @@ def calculate_adx(symbol, start_date, period, length=None, scalar=None, drift=No
 
     :rtype: Adx
     """
-    return 'do some magic!'
+    try:
+        end = get_end_date()
+        start, required_start = get_start_dates(period)
+
+        if USE_POLYGON == True:
+            stock=get_historical_data_polygon_updated(symbol,start,end, period)
+        else:
+            stock=get_historical_data_yfinance(symbol,start,end)
+        
+        adx = stock.ta.adx(high=stock['High'], low=stock['Low'], close=stock['Close'], length=length, lensig=lensig, scalar=scalar, drift=drift)
+        
+        output = cleandfupdated(adx,stock, required_start, end, 2,"_.*$")
+
+        output = Adx.from_dict(output.to_dict(orient='records'))
+        
+        return output
+    except Exception as e:
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
+
 
 def calculate_bollinger_bands(symbol, start_date, period, length=5, standard_deviation=2):  # noqa: E501
     """An oscillator meaning that it operates between or within a set range of numbers or parameters..
@@ -131,10 +172,8 @@ def calculate_bollinger_bands_updated(symbol, period, length=5, standard_deviati
     """
     try:
 
-        back_period = process_period(period)
-        start=datetime.now() - timedelta(days=back_period+current_app.config['BACK_PERIOD'])
-        required_start = datetime.now() - timedelta(days=back_period+current_app.config['BACK_PERIOD'])
-        end=datetime.now()
+        end = get_end_date()
+        start, required_start = get_start_dates(period)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
@@ -158,7 +197,7 @@ def calculate_bollinger_bands_updated(symbol, period, length=5, standard_deviati
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_ema(symbol, start_date, period, length=5):  # noqa: E501
+def calculate_ema(symbol, period, length=5):  # noqa: E501
     """The average price over the specified period
 
      # noqa: E501
@@ -175,12 +214,11 @@ def calculate_ema(symbol, start_date, period, length=5):  # noqa: E501
     :rtype: Ema
     """
     try:
-        start = get_historical_start_date(start_date,length)
-        end = get_end_date(start_date,period)
-        required_start = get_required_start_date(start_date)
+        end = get_end_date()
+        start, required_start = get_start_dates(period)
 
         if USE_POLYGON == True:
-            stock=get_historical_data_polygon(symbol,start,end)
+            stock=get_historical_data_polygon_updated(symbol,start,end, period)
         else:
             stock=get_historical_data_yfinance(symbol,start,end)
         
@@ -195,7 +233,7 @@ def calculate_ema(symbol, start_date, period, length=5):  # noqa: E501
         jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
 
-        output = Ema(jsondf['Date'].values.tolist(), jsondf['Close'].values.tolist(), jsondf['EMA'].values.tolist())
+        output = Ema(jsondf['timestamp'].values.tolist(), jsondf['Close'].values.tolist(), jsondf['EMA'].values.tolist())
 
         return output
     except Exception as e:
@@ -207,7 +245,7 @@ def calculate_ema(symbol, start_date, period, length=5):  # noqa: E501
 
 
 
-def calculate_sma(symbol, start_date, period, length=5):  # noqa: E501
+def calculate_sma(symbol, period, length=5):  # noqa: E501
     """The average price over the specified period
 
      # noqa: E501
@@ -224,15 +262,13 @@ def calculate_sma(symbol, start_date, period, length=5):  # noqa: E501
     :rtype: Sma
     """
     try:
-        start = get_historical_start_date(start_date,length)
-        end = get_end_date(start_date,period)
-        required_start = get_required_start_date(start_date)
+        end = get_end_date()
+        start, required_start = get_start_dates(period)
 
         if USE_POLYGON == True:
-            stock=get_historical_data_polygon(symbol, start,end)
+            stock=get_historical_data_polygon_updated(symbol,start,end, period)
         else:
             stock=get_historical_data_yfinance(symbol,start,end)
-        
 
         sma = stock.ta.sma(close="Close", length=length).dropna()
         outputdf = pd.merge(stock, sma, left_index=True, right_index=True)
@@ -245,7 +281,7 @@ def calculate_sma(symbol, start_date, period, length=5):  # noqa: E501
         jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
 
-        output = Sma(jsondf['Date'].values.tolist(), jsondf['Close'].values.tolist(), jsondf['SMA'].values.tolist())
+        output = Sma(jsondf['timestamp'].values.tolist(), jsondf['Close'].values.tolist(), jsondf['SMA'].values.tolist())
 
         return output
     except Exception as e:

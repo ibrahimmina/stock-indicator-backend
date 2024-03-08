@@ -21,55 +21,6 @@ tags:
       Technical indicators that oscillate between a local minimum and maximum
       are plotted above or below a price chart.
 paths:
-  /candlestick:
-    get:
-      tags:
-        - GeneralStockInfo
-      summary: The average price over the specified period
-      operationId: calculate_candlestick
-      parameters:
-        - name: symbol
-          in: query
-          description: Ticker Symbol Required
-          required: true
-          style: form
-          explode: true
-          schema:
-            type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
-        - name: period
-          in: query
-          description: The Analysis Period in Days from Start Date
-          required: true
-          style: form
-          explode: true
-          schema:
-            minimum: 1
-            type: integer
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/candlestick"
-        "401":
-          description: API key is missing or invalid
-        "404":
-          description: The specified symbol was not found
-        "405":
-          description: Validation exception
-      x-openapi-router-controller: swagger_server.controllers.general_stock_info_controller
   /candlesticknew:
     get:
       tags:
@@ -87,12 +38,13 @@ paths:
             type: string
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
             type: string
+            enum: [day, hour, week, month]
       responses:
         "200":
           description: successful operation
@@ -125,26 +77,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
       responses:
         "200":
           description: successful operation
@@ -174,26 +115,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: The short period
@@ -232,26 +162,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: The short period
@@ -268,75 +187,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ema"
-        "401":
-          description: API key is missing or invalid
-        "404":
-          description: The specified symbol was not found
-        "405":
-          description: Validation exception
-      x-openapi-router-controller: swagger_server.controllers.overlays_controller
-  /bollinger:
-    get:
-      tags:
-        - Overlays
-      summary:
-        An oscillator meaning that it operates between or within a set range
-        of numbers or parameters..
-      operationId: calculate_bollinger_bands
-      parameters:
-        - name: symbol
-          in: query
-          description: Ticker Symbol Required
-          required: true
-          style: form
-          explode: true
-          schema:
-            type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
-        - name: period
-          in: query
-          description: The Analysis Period in Days from Start Date
-          required: true
-          style: form
-          explode: true
-          schema:
-            minimum: 1
-            type: integer
-        - name: length
-          in: query
-          description: The short period
-          required: false
-          style: form
-          explode: true
-          schema:
-            type: integer
-            default: 5
-        - name: standard_deviation
-          in: query
-          description: The long period
-          required: false
-          style: form
-          explode: true
-          schema:
-            type: integer
-            default: 2
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/bollinger"
         "401":
           description: API key is missing or invalid
         "404":
@@ -363,12 +213,13 @@ paths:
             type: string
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
             type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: The short period
@@ -418,26 +269,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: period length
@@ -507,26 +347,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: fast
           in: query
           description: The short period
@@ -583,26 +412,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: fast
           in: query
           description: The short period
@@ -668,26 +486,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: fast
           in: query
           description: The short period
@@ -755,26 +562,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: initial_acceleration
           in: query
           description: The psar initial acceleration
@@ -833,26 +629,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: period length
@@ -902,26 +687,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: period length
@@ -971,26 +745,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
       responses:
         "200":
           description: successful operation
@@ -1022,26 +785,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: period length
@@ -1091,26 +843,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: period length
@@ -1160,26 +901,15 @@ paths:
           explode: true
           schema:
             type: string
-        - name: start_date
-          in: query
-          description: Start Date of Analysis in YYYY-MM-DD Format
-          required: true
-          style: form
-          explode: true
-          schema:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: 2019-05-17T00:00:00.000Z
         - name: period
           in: query
-          description: The Analysis Period in Days from Start Date
+          description: The Analysis Period required
           required: true
           style: form
           explode: true
           schema:
-            minimum: 1
-            type: integer
+            type: string
+            enum: [day, hour, week, month]
         - name: length
           in: query
           description: period length
@@ -1208,12 +938,12 @@ components:
     candlestick:
       type: object
       properties:
-        Date:
+        timestamp:
           type: array
           items:
             type: string
             format: Date
-            example: "2023-01-06, 2023-01-07"
+            example: "1707436800000"
         Close:
           type: array
           items:
@@ -1257,19 +987,17 @@ components:
         AdjClose:
           - 0.8
           - 0.8
-        Date:
-          - "2023-01-06, 2023-01-07"
-          - "2023-01-06, 2023-01-07"
+        timestamp:
+          - "1707436800000"
     sma:
       type: object
       properties:
-        Date:
+        timestamp:
           type: array
           items:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
             type: string
             format: Date
-            example: "2023-01-06, 2023-01-07"
+            example: "1707436800000"
         Close:
           type: array
           items:
@@ -1286,18 +1014,16 @@ components:
           - 0.8
           - 0.8
         Date:
-          - "2023-01-06, 2023-01-07"
-          - "2023-01-06, 2023-01-07"
+          - "1707436800000"
     ema:
       type: object
       properties:
-        Date:
+        timestamp:
           type: array
           items:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
             type: string
             format: Date
-            example: "2023-01-06, 2023-01-07"
+            example: "1707436800000"
         Close:
           type: array
           items:
@@ -1313,60 +1039,18 @@ components:
         Close:
           - 0.8
           - 0.8
-        Date:
-          - "2023-01-06, 2023-01-07"
-          - "2023-01-06, 2023-01-07"
-    bollinger:
-      type: object
-      properties:
-        Date:
-          type: array
-          items:
-            pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
-            type: string
-            format: Date
-            example: "2023-01-06, 2023-01-07"
-        BBL:
-          type: array
-          items:
-            type: number
-        BBM:
-          type: array
-          items:
-            type: number
-        BBU:
-          type: array
-          items:
-            type: number
-        Close:
-          type: array
-          items:
-            type: number
-      example:
-        BBU:
-          - 1.46
-          - 1.46
-        Close:
-          - 5.96
-          - 5.96
-        BBM:
-          - 6.027
-          - 6.02
-        BBL:
-          - 0.8
-          - 0.8
-        Date:
-          - "2023-01-06, 2023-01-07"
-          - "2023-01-06, 2023-01-07"
+        timestamp:
+          - "1707436800000"
+          - "1707436800001"
     bollingernew:
       type: object
       properties:
-        Date:
+        timestamp:
           type: array
           items:
             type: string
             format: Date
-            example: "2023-01-06, 2023-01-07"
+            example: "1707436800000"
         BBL:
           type: array
           items:
@@ -1396,9 +1080,9 @@ components:
         BBL:
           - 0.8
           - 0.8
-        Date:
-          - "2023-01-06, 2023-01-07"
-          - "2023-01-06, 2023-01-07"
+        timestamp:
+          - "1707436800000"
+          - "1707436800001"
     psar:
       type: array
       items:
@@ -1450,11 +1134,10 @@ components:
     psar_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         PSARl:
           type: number
           example: 145.02
@@ -1472,19 +1155,18 @@ components:
         PSARs: 154.02
         PSARl: 145.02
         PSARaf: 0.1
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     adx_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         ADX:
           type: number
           example: 145.02
-        DMX:
+        DMP:
           type: number
           example: 154.02
         DMN:
@@ -1494,15 +1176,14 @@ components:
         ADX: 1
         DMX: 154.02
         DMN: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     macd_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         MACD:
           type: number
           example: 145.02
@@ -1516,15 +1197,14 @@ components:
         MACD: 1
         HIST: 154.02
         SIG: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     ppo_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         PPO:
           type: number
           example: 145.02
@@ -1538,15 +1218,14 @@ components:
         PPO: 1
         HIST: 154.02
         SIG: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     pvo_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         PVO:
           type: number
           example: 145.02
@@ -1560,105 +1239,98 @@ components:
         PVO: 1
         HIST: 154.02
         SIG: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     cci_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         cci:
           type: number
           example: 145.02
       example:
         cci: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     cmf_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         cmf:
           type: number
           example: 145.02
       example:
         cmf: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     roc_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         roc:
           type: number
           example: 145.02
       example:
         roc: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     efi_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         efi:
           type: number
           example: 145.02
       example:
         efi: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     mfi_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         mfi:
           type: number
           example: 145.02
       example:
         mfi: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     obv_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         obv:
           type: number
           example: 145.02
       example:
         obv: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
     adl_inner:
       type: object
       properties:
-        Date:
-          pattern: "^([0-9]{4})-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])$"
+        timestamp:
           type: string
-          format: Date
-          example: 2023-01-06T00:00:00.000Z
+          format: timestamp
+          example: 1707436800000
         adl:
           type: number
           example: 145.02
       example:
         adl: 145.02
-        Date: 2023-01-06T00:00:00.000Z
+        timestamp: 1707436800000
   responses:
     UnauthorizedError:
       description: API key is missing or invalid
