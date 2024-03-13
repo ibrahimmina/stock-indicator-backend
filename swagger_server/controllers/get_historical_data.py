@@ -27,7 +27,7 @@ def get_historical_data_polygon_updated(symbol,start,end,period):
     stock=pd.DataFrame(polygon_client.get_aggs(ticker=symbol, multiplier=1, timespan=period, from_=start, to=end,sort="asc", limit=50000))
     process_dataframe(stock)
     stock['Date']=(pd.to_datetime(stock['timestamp'],unit='ms')) 
-    stock['Date'] = pd.to_datetime(stock['Date']).dt.date
+    #stock['Date'] = pd.to_datetime(stock['Date']).dt.date
     stock.set_index('Date', inplace=True)    
     stock.drop(['transactions','otc'], axis=1, inplace=True)
     stock.rename(columns={"open": "Open", "high": "High", "low": "Low", "close": "Close", "volume": "Volume", "vwap": "Adj Close"}, inplace=True)

@@ -232,8 +232,8 @@ def calculate_ema(symbol, period, length=5):  # noqa: E501
         jsondf = jsondf.loc[required_start.date():end.date()]
         jsondf = jsondf.round(2)   
         
-        jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
-        jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
+        #jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
+        #jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
 
         jsondf.dropna(inplace=True)
 
@@ -282,8 +282,8 @@ def calculate_sma(symbol, period, length=5):  # noqa: E501
         jsondf = jsondf.loc[required_start.date():end.date()]
         jsondf = jsondf.round(2)
 
-        jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
-        jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
+        #jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
+        #jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
 
         jsondf.dropna(inplace=True)
 
