@@ -17,4 +17,5 @@ def cleandfupdated(df,stock,start,end,round_number,clean_regex):
     output = tempDF.loc[start.date():end.date()]
     output = output.round(round_number)
     output.columns = output.columns.str.replace(clean_regex, "", regex=True)
+    output.dropna(inplace=True)
     return output

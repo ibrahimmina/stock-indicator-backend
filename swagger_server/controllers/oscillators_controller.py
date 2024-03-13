@@ -220,7 +220,6 @@ def calculate_mfi(symbol, period, length=14, drift=1):  # noqa: E501
 
         df = mfi.to_frame()
         output = cleandfupdated(df,stock, required_start, end, 2,"_.*$")
-
         output = Mfi.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
