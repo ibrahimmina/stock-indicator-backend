@@ -43,6 +43,8 @@ def calculate_candlestick_updated(symbol, period):  # noqa: E501
             stock=get_historical_data_yfinance(symbol,start,end)
         
         stock = stock.round(2)
+
+        stock.dropna(inplace=True)
         
         output = Candlestick(stock['timestamp'].values.tolist(), stock['Close'].values.tolist(), stock['Open'].values.tolist(), stock['High'].values.tolist(), stock['Low'].values.tolist(),stock['Volume'].values.tolist(), stock['Adj Close'].values.tolist())
 

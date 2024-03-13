@@ -188,6 +188,8 @@ def calculate_bollinger_bands_updated(symbol, period, length=5, standard_deviati
         bbands = bbands.loc[required_start.date():end.date()]
         bbands = bbands.round(2)
 
+        bbands.dropna(inplace=True)
+
         output = Bollinger(bbands['timestamp'].values.tolist(), bbands['BBL'].values.tolist(), bbands['BBM'].values.tolist(), bbands['BBU'].values.tolist(), bbands['Close'].values.tolist())
 
         return output
@@ -232,6 +234,8 @@ def calculate_ema(symbol, period, length=5):  # noqa: E501
         
         jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
+
+        jsondf.dropna(inplace=True)
 
         output = Ema(jsondf['timestamp'].values.tolist(), jsondf['Close'].values.tolist(), jsondf['EMA'].values.tolist())
 
@@ -280,6 +284,8 @@ def calculate_sma(symbol, period, length=5):  # noqa: E501
 
         jsondf['Date'] = pd.to_datetime(jsondf.index.astype(str), format='%Y-%M-%d')
         jsondf['Date'] = jsondf['Date'].dt.strftime('%Y-%M-%d')
+
+        jsondf.dropna(inplace=True)
 
         output = Sma(jsondf['timestamp'].values.tolist(), jsondf['Close'].values.tolist(), jsondf['SMA'].values.tolist())
 
