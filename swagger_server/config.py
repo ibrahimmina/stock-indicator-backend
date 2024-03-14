@@ -8,10 +8,10 @@ class Config(object):
     USE_POLYGON = True
     BACK_PERIOD=30
     PERIOD_DICT = {
-    'hour': 28,
-    'day': 365,
-    'week': 1825,
-    'month': 7300
+    'hour': 7,
+    'day': 84,
+    'week': 365,
+    'month': 1456
     }
 
 class ProductionConfig(Config):
