@@ -6,7 +6,7 @@ class Config(object):
     API_KEY = os.environ.get('api_key')
     POLYGON_API_KEY = os.environ.get('polygon_api_key')
     USE_POLYGON = True
-    BACK_PERIOD=30
+    BACK_PERIOD=5000
     PERIOD_DICT = {
     'hour': 7,
     'day': 84,

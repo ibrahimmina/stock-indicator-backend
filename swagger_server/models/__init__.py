@@ -30,4 +30,8 @@ from swagger_server.models.pvo import Pvo
 from swagger_server.models.pvo_inner import PvoInner
 from swagger_server.models.roc import Roc
 from swagger_server.models.roc_inner import RocInner
+from swagger_server.models.rsi import Rsi
+from swagger_server.models.rsi_inner import RsiInner
 from swagger_server.models.sma import Sma
+from swagger_server.models.stoch import Stoch
+from swagger_server.models.stoch_inner import StochInner

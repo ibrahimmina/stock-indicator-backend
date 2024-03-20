@@ -13,6 +13,8 @@ from swagger_server.models.ppo import Ppo  # noqa: E501
 from swagger_server.models.psar import Psar  # noqa: E501
 from swagger_server.models.pvo import Pvo  # noqa: E501
 from swagger_server.models.roc import Roc  # noqa: E501
+from swagger_server.models.rsi import Rsi  # noqa: E501
+from swagger_server.models.stoch import Stoch  # noqa: E501
 from swagger_server import util
 
 import pandas as pd
@@ -439,3 +441,86 @@ def calculate_roc(symbol, period, length=1, scalar=100):  # noqa: E501
             return jsonify({'error': str(e)}), e.response_code
         else:
             return jsonify({'error': str(e)}), 500
+
+def calculate_rsi(symbol, period, length=14, scalar=100, drift=1):  # noqa: E501
+    """The Relative Strength Index is popular momentum oscillator used to measure the velocity as well as the magnitude of directional price movements.
+
+     # noqa: E501
+
+    :param symbol: Ticker Symbol Required
+    :type symbol: str
+    :param period: The Analysis Period required
+    :type period: str
+    :param length: period length
+    :type length: float
+    :param scalar: How much to magnify
+    :type scalar: float
+    :param drift: The difference period
+    :type drift: float
+
+    :rtype: Rsi
+    """
+    try:
+        end = get_end_date()
+        start, required_start = get_start_dates(period)
+
+        if USE_POLYGON == True:
+            stock=get_historical_data_polygon_updated(symbol,start,end, period)
+        else:
+            stock=get_historical_data_yfinance(symbol,start,end)
+        
+        rsi = stock.ta.rsi(close=stock['Close'], length=length, scalar=scalar, drift=drift)
+
+        df = rsi.to_frame()
+
+        output = cleandfupdated(df, stock, required_start, end, 2,"_.*$")
+
+        output = Rsi.from_dict(output.to_dict(orient='records'))
+        
+        return output
+
+    except Exception as e:
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500
+
+
+def calculate_stoch(symbol, period, fast=14, slow=3, smooth_k=3):  # noqa: E501
+    """The Stochastic Oscillator (STOCH) was developed by George Lane in the 1950&#x27;s. He believed this indicator was a good way to measure momentum because changes in momentum precede changes in price.
+
+     # noqa: E501
+
+    :param symbol: Ticker Symbol Required
+    :type symbol: str
+    :param period: The Analysis Period required
+    :type period: str
+    :param k: The Fast %K period.
+    :type k: float
+    :param d: The Slow %K period.
+    :type d: float
+    :param smooth_k: The Slow %D period.
+    :type smooth_k: float
+
+    :rtype: Stoch
+    """
+    try:
+        end = get_end_date()
+        start, required_start = get_start_dates(period)
+
+        if USE_POLYGON == True:
+            stock=get_historical_data_polygon_updated(symbol,start,end, period)
+        else:
+            stock=get_historical_data_yfinance(symbol,start,end)
+        
+        stoch = stock.ta.stoch(high=stock['High'],low=stock['Low'],close=stock['Close'],k=int(fast), d=int(slow), smooth_k=int(smooth_k))
+
+        output = cleandfupdated(stoch, stock, required_start, end, 2,"_.*$")
+            
+        output = Stoch.from_dict(output.to_dict(orient='records'))
+        return output
+    except Exception as e:
+        if hasattr(e,'response_code'):
+            return jsonify({'error': str(e)}), e.response_code
+        else:
+            return jsonify({'error': str(e)}), 500   

@@ -44,7 +44,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
       responses:
         "200":
           description: successful operation
@@ -59,7 +63,6 @@ paths:
         "405":
           description: Validation exception
       x-openapi-router-controller: swagger_server.controllers.general_stock_info_controller
-
   /adl:
     get:
       tags:
@@ -85,7 +88,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
       responses:
         "200":
           description: successful operation
@@ -123,7 +130,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: The short period
@@ -170,7 +181,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: The short period
@@ -219,7 +234,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: The short period
@@ -277,7 +296,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: period length
@@ -355,7 +378,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: fast
           in: query
           description: The short period
@@ -420,7 +447,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: fast
           in: query
           description: The short period
@@ -494,7 +525,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: fast
           in: query
           description: The short period
@@ -570,7 +605,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: initial_acceleration
           in: query
           description: The psar initial acceleration
@@ -637,7 +676,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: period length
@@ -695,7 +738,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: period length
@@ -753,7 +800,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
       responses:
         "200":
           description: successful operation
@@ -793,7 +844,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: period length
@@ -851,7 +906,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: period length
@@ -909,7 +968,11 @@ paths:
           explode: true
           schema:
             type: string
-            enum: [day, hour, week, month]
+            enum:
+              - day
+              - hour
+              - week
+              - month
         - name: length
           in: query
           description: period length
@@ -926,6 +989,149 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/cmf"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.oscillators_controller
+  /rsi:
+    get:
+      tags:
+        - Oscillators
+      summary:
+        The Relative Strength Index is popular momentum oscillator used to
+        measure the velocity as well as the magnitude of directional price movements.
+      operationId: calculate_rsi
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          description: The Analysis Period required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - day
+              - hour
+              - week
+              - month
+        - name: length
+          in: query
+          description: period length
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 14
+        - name: scalar
+          in: query
+          description: How much to magnify
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 100
+        - name: drift
+          in: query
+          description: The difference period
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 1
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/rsi"
+        "401":
+          description: API key is missing or invalid
+        "404":
+          description: The specified symbol was not found
+        "405":
+          description: Validation exception
+      x-openapi-router-controller: swagger_server.controllers.oscillators_controller
+  /stoch:
+    get:
+      tags:
+        - Oscillators
+      summary:
+        The Stochastic Oscillator (STOCH) was developed by George Lane in the
+        1950's. He believed this indicator was a good way to measure momentum because
+        changes in momentum precede changes in price.
+      operationId: calculate_stoch
+      parameters:
+        - name: symbol
+          in: query
+          description: Ticker Symbol Required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+        - name: period
+          in: query
+          description: The Analysis Period required
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - day
+              - hour
+              - week
+              - month
+        - name: fast
+          in: query
+          description: The Fast %K period.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 14
+        - name: slow
+          in: query
+          description: The Slow %K period.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 3
+        - name: smooth_k
+          in: query
+          description: The Slow %D period.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: number
+            default: 3
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/stoch"
         "401":
           description: API key is missing or invalid
         "404":
@@ -1131,13 +1337,21 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/macd_inner"
+    rsi:
+      type: array
+      items:
+        $ref: "#/components/schemas/rsi_inner"
+    stoch:
+      type: array
+      items:
+        $ref: "#/components/schemas/stoch_inner"
     psar_inner:
       type: object
       properties:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         PSARl:
           type: number
           example: 145.02
@@ -1162,7 +1376,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         ADX:
           type: number
           example: 145.02
@@ -1183,7 +1397,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         MACD:
           type: number
           example: 145.02
@@ -1204,7 +1418,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         PPO:
           type: number
           example: 145.02
@@ -1225,7 +1439,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         PVO:
           type: number
           example: 145.02
@@ -1240,13 +1454,30 @@ components:
         HIST: 154.02
         SIG: 145.02
         timestamp: 1707436800000
+    stoch_inner:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: timestamp
+          example: "1707436800000"
+        STOCHk:
+          type: number
+          example: 145.02
+        STOCHd:
+          type: number
+          example: 154.02
+      example:
+        STOCHk: 1
+        STOCHd: 154.02
+        timestamp: 1707436800000
     cci_inner:
       type: object
       properties:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         cci:
           type: number
           example: 145.02
@@ -1259,7 +1490,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         cmf:
           type: number
           example: 145.02
@@ -1272,7 +1503,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         roc:
           type: number
           example: 145.02
@@ -1285,7 +1516,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         efi:
           type: number
           example: 145.02
@@ -1298,7 +1529,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         mfi:
           type: number
           example: 145.02
@@ -1311,7 +1542,7 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         obv:
           type: number
           example: 145.02
@@ -1324,12 +1555,25 @@ components:
         timestamp:
           type: string
           format: timestamp
-          example: 1707436800000
+          example: "1707436800000"
         adl:
           type: number
           example: 145.02
       example:
         adl: 145.02
+        timestamp: 1707436800000
+    rsi_inner:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: timestamp
+          example: "1707436800000"
+        rsi:
+          type: number
+          example: 145.02
+      example:
+        rsi: 145.02
         timestamp: 1707436800000
   responses:
     UnauthorizedError:

@@ -15,6 +15,8 @@ from swagger_server.models.ppo import Ppo  # noqa: E501
 from swagger_server.models.psar import Psar  # noqa: E501
 from swagger_server.models.pvo import Pvo  # noqa: E501
 from swagger_server.models.roc import Roc  # noqa: E501
+from swagger_server.models.rsi import Rsi  # noqa: E501
+from swagger_server.models.stoch import Stoch  # noqa: E501
 from swagger_server.test import BaseTestCase
 
 
@@ -194,7 +196,40 @@ class TestOscillatorsController(BaseTestCase):
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 
+    def test_calculate_rsi(self):
+        """Test case for calculate_rsi
 
+        The Relative Strength Index is popular momentum oscillator used to measure the velocity as well as the magnitude of directional price movements.
+        """
+        query_string = [('symbol', 'symbol_example'),
+                        ('period', 'period_example'),
+                        ('length', 14),
+                        ('scalar', 100),
+                        ('drift', 1)]
+        response = self.client.open(
+            '//rsi',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+
+    def test_calculate_stoch(self):
+        """Test case for calculate_stoch
+
+        The Stochastic Oscillator (STOCH) was developed by George Lane in the 1950's. He believed this indicator was a good way to measure momentum because changes in momentum precede changes in price.
+        """
+        query_string = [('symbol', 'symbol_example'),
+                        ('period', 'period_example'),
+                        ('k', 14),
+                        ('d', 3),
+                        ('smooth_k', 3)]
+        response = self.client.open(
+            '//stoch',
+            method='GET',
+            query_string=query_string)
+        self.assert200(response,
+                       'Response body is : ' + response.data.decode('utf-8'))
+                       
 if __name__ == '__main__':
     import unittest
     unittest.main()
