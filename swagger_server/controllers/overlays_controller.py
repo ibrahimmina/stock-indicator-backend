@@ -173,13 +173,13 @@ def calculate_bollinger_bands_updated(symbol, period, length=5, standard_deviati
     try:
 
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period,length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
         else:
             stock=get_historical_data_yfinance(symbol,start,end)
-        
+
         bbands = stock.ta.bbands(close="Close", std=standard_deviation, length=length).dropna()
         bbands = pd.merge(stock, bbands, left_index=True, right_index=True)
         bbands.columns = bbands.columns.str.replace("_*.\d", "", regex=True)
@@ -217,7 +217,7 @@ def calculate_ema(symbol, period, length=5):  # noqa: E501
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period,length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
@@ -267,14 +267,13 @@ def calculate_sma(symbol, period, length=5):  # noqa: E501
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period,length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
         else:
             stock=get_historical_data_yfinance(symbol,start,end)
-
-        sma = stock.ta.sma(close="Close", length=length).dropna()
+        sma = stock.ta.sma(close="Close", length=length)
         outputdf = pd.merge(stock, sma, left_index=True, right_index=True)
         jsondf = outputdf.drop(['Open', 'High', 'Low', 'Adj Close', 'Volume'], axis=1)
         jsondf.columns = jsondf.columns.str.replace("^SMA_*[0-9]*", "SMA", regex=True)
