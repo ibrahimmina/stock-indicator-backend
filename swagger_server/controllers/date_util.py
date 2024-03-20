@@ -23,8 +23,12 @@ def get_required_start_date(period):
 
 def get_start_dates(period,length=0):
     back_period = process_period(period)
-    back_days = back_period+length+current_app.config['BACK_PERIOD']
-
+    if period == "week":
+        back_days = back_period+(length*7)+(current_app.config['BACK_PERIOD']*7)
+    elif period == "month":
+        back_days = back_period+(length*30)+(current_app.config['BACK_PERIOD']*30)
+    else:
+        back_days = back_period+length+current_app.config['BACK_PERIOD']
     
     start=datetime.now() - timedelta(days=back_days)
     required_start = datetime.now() - timedelta(days=back_period)
