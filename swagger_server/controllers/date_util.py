@@ -22,7 +22,7 @@ def get_required_start_date(period):
     return start
 
 def get_start_dates(period,length=0):
-    back_period = process_period(period)
+    back_period = process_period(period)  
     if period == "week":
         back_days = back_period+(length*7)+(current_app.config['BACK_PERIOD']*7)
     elif period == "month":

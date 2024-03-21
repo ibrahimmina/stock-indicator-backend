@@ -59,7 +59,7 @@ def calculate_adl(symbol, period):  # noqa: E501
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_adx(symbol, period, length=None, scalar=None, drift=None, lensig=None):  # noqa: E501
+def calculate_adx(symbol, period, length=14, scalar=100, drift=1, lensig=14):  # noqa: E501
     """Average Directional Movement is meant to quantify trend strength by measuring the amount of movement in a single direction.
 
      # noqa: E501
@@ -83,7 +83,7 @@ def calculate_adx(symbol, period, length=None, scalar=None, drift=None, lensig=N
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period, length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
@@ -103,54 +103,6 @@ def calculate_adx(symbol, period, length=None, scalar=None, drift=None, lensig=N
         else:
             return jsonify({'error': str(e)}), 500
 
-
-def calculate_bollinger_bands(symbol, start_date, period, length=5, standard_deviation=2):  # noqa: E501
-    """An oscillator meaning that it operates between or within a set range of numbers or parameters..
-
-     # noqa: E501
-
-    :param symbol: Ticker Symbol Required
-    :type symbol: str
-    :param start_date: Start Date of Analysis in YYYY-MM-DD Format
-    :type start_date: str
-    :param period: The Analysis Period in Days from Start Date
-    :type period: int
-    :param length: The short period
-    :type length: int
-    :param standard_deviation: The long period
-    :type standard_deviation: int
-
-    :rtype: Bollinger
-    """
-    try:
-        start = get_historical_start_date(start_date,length)
-        end = get_end_date(start_date,period)
-        required_start = get_required_start_date(start_date)
-
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon(symbol,start,end)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
-        
-        bbands = stock.ta.bbands(close="Close", std=standard_deviation, length=length).dropna()
-        bbands = pd.merge(stock, bbands, left_index=True, right_index=True)
-        bbands.columns = bbands.columns.str.replace("_*.\d", "", regex=True)
-        bbands = bbands.drop(['BBB', 'BBP','Open', 'High', 'Low', 'Adj Close', 'Volume'], axis=1)
-        
-        bbands = bbands.loc[required_start.date():end.date()]
-        bbands = bbands.round(2)
-        
-        bbands['Date'] = pd.to_datetime(bbands.index.astype(str), format='%Y-%M-%d')
-        bbands['Date'] = bbands['Date'].dt.strftime('%Y-%M-%d')
-
-        output = Bollinger(bbands['Date'].values.tolist(), bbands['BBL'].values.tolist(), bbands['BBM'].values.tolist(), bbands['BBU'].values.tolist(), bbands['Close'].values.tolist())
-
-        return output
-    except Exception as e:
-        if hasattr(e,'response_code'):
-            return jsonify({'error': str(e)}), e.response_code
-        else:
-            return jsonify({'error': str(e)}), 500
 
 def calculate_bollinger_bands_updated(symbol, period, length=5, standard_deviation=2):  # noqa: E501
     """An oscillator meaning that it operates between or within a set range of numbers or parameters..
@@ -182,7 +134,7 @@ def calculate_bollinger_bands_updated(symbol, period, length=5, standard_deviati
 
         bbands = stock.ta.bbands(close="Close", std=standard_deviation, length=length).dropna()
         bbands = pd.merge(stock, bbands, left_index=True, right_index=True)
-        bbands.columns = bbands.columns.str.replace("_*.\d", "", regex=True)
+        bbands.columns = bbands.columns.str.replace("_.*$", "", regex=True)
         bbands = bbands.drop(['BBB', 'BBP','Open', 'High', 'Low', 'Adj Close', 'Volume'], axis=1)
         
         bbands = bbands.loc[required_start.date():end.date()]

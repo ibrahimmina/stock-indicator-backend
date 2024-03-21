@@ -49,7 +49,7 @@ def calculate_cci(symbol, period, length=14, cci_scaling_constant=0.015):  # noq
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period, length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
@@ -88,7 +88,7 @@ def calculate_cmf(symbol, period, length=20):  # noqa: E501
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period, length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
@@ -127,7 +127,7 @@ def calculate_efi(symbol, period, length=13, drift=1):  # noqa: E501
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period, length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
@@ -211,7 +211,7 @@ def calculate_mfi(symbol, period, length=14, drift=1):  # noqa: E501
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period, length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
@@ -269,7 +269,7 @@ def calculate_obv(symbol, period):  # noqa: E501
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_psar(symbol, period, initial_acceleration=None, acceleration=None, max_acceleration=None):  # noqa: E501
+def calculate_psar(symbol, period, initial_acceleration=0.02, acceleration=0.02, max_acceleration=0.2):  # noqa: E501
     """An oscillator meaning that it operates between or within a set range of numbers or parameters..
 
      # noqa: E501
@@ -298,7 +298,7 @@ def calculate_psar(symbol, period, initial_acceleration=None, acceleration=None,
         else:
             stock=get_historical_data_yfinance(symbol,start,end)
         
-        psar = stock.ta.psar(high=stock['High'], low=stock['Low'], close=stock['Close'],af0=0.02,af=0.02,max_af=0.2)
+        psar = stock.ta.psar(high=stock['High'], low=stock['Low'], close=stock['Close'],af0=initial_acceleration,af=acceleration,max_af=max_acceleration)
 
         output = cleandfupdated(psar, stock,required_start, end, 2,"_.*$")
         
@@ -311,7 +311,7 @@ def calculate_psar(symbol, period, initial_acceleration=None, acceleration=None,
         else:
             return jsonify({'error': str(e)}), 500
             
-def calculate_ppo(symbol, period, fast=None, slow=None, signal=None, scalar=None):  # noqa: E501
+def calculate_ppo(symbol, period, fast=12, slow=26, signal=9, scalar=100):  # noqa: E501
     """The Percentage Price Oscillator is similar to MACD in measuring momentum.
 
      # noqa: E501
@@ -356,7 +356,7 @@ def calculate_ppo(symbol, period, fast=None, slow=None, signal=None, scalar=None
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_pvo(symbol, period, fast=None, slow=None, signal=None, scalar=None):  # noqa: E501
+def calculate_pvo(symbol, period, fast=12, slow=26, signal=9, scalar=100):  # noqa: E501
     """Percentage Volume Oscillator is a Momentum Oscillator for Volume.
 
      # noqa: E501
@@ -421,7 +421,7 @@ def calculate_roc(symbol, period, length=1, scalar=100):  # noqa: E501
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period, length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)
@@ -462,7 +462,7 @@ def calculate_rsi(symbol, period, length=14, scalar=100, drift=1):  # noqa: E501
     """
     try:
         end = get_end_date()
-        start, required_start = get_start_dates(period)
+        start, required_start = get_start_dates(period, length)
 
         if USE_POLYGON == True:
             stock=get_historical_data_polygon_updated(symbol,start,end, period)

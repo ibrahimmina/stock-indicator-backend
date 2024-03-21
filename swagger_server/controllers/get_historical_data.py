@@ -24,7 +24,11 @@ def process_dataframe(df):
 
 def get_historical_data_polygon_updated(symbol,start,end,period):
   try:
-    stock=pd.DataFrame(polygon_client.get_aggs(ticker=symbol, multiplier=1, timespan=period, from_=start, to=end,sort="asc", limit=50000))
+    aggs = []
+    for a in polygon_client.list_aggs(ticker=symbol, multiplier=1, timespan=period, from_=start, to=end,sort="asc", limit=50000):
+        aggs.append(a)
+    stock=pd.DataFrame(aggs)
+    #stock=pd.DataFrame(polygon_client.get_aggs(ticker=symbol, multiplier=1, timespan=period, from_=start, to=end,sort="asc", limit=50000))
     process_dataframe(stock)
     stock['Date']=(pd.to_datetime(stock['timestamp'],unit='ms')) 
     #stock['Date'] = pd.to_datetime(stock['Date']).dt.date
@@ -44,7 +48,6 @@ def get_historical_data_polygon_updated(symbol,start,end,period):
     raise CustomException(f"Unexpected exception: {ce}",ce.response_code)
   except Exception as e:
     # Handle other unexpected exceptions
-    print (traceback.format_exc())
     raise CustomException(f"Unexpected exception: {e}",500)
 
 
