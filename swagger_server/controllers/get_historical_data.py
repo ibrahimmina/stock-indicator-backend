@@ -2,7 +2,6 @@ from polygon import RESTClient
 from datetime import datetime, timedelta
 import pandas as pd
 from flask import current_app
-from swagger_server.controllers.date_util import get_end_date, get_historical_start_date
 import yfinance as yf
 from polygon.exceptions import AuthError, BadResponse
 from swagger_server.exceptions import CustomException
@@ -22,10 +21,10 @@ def process_dataframe(df):
 
 
 
-def get_historical_data_polygon_updated(symbol,start,end,period):
+def get_historical_data_polygon_updated(symbol,start,end,period,multiplier):
   try:
     aggs = []
-    for a in polygon_client.list_aggs(ticker=symbol, multiplier=1, timespan=period, from_=start, to=end,sort="asc", limit=50000):
+    for a in polygon_client.list_aggs(ticker=symbol, multiplier=multiplier, timespan=period, from_=start, to=end,sort="asc", limit=50000):
         aggs.append(a)
     stock=pd.DataFrame(aggs)
     #stock=pd.DataFrame(polygon_client.get_aggs(ticker=symbol, multiplier=1, timespan=period, from_=start, to=end,sort="asc", limit=50000))

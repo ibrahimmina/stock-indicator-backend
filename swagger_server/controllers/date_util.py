@@ -11,19 +11,11 @@ def get_end_date():
     end=datetime.now()
     return end
 
-def get_historical_start_date(period):
-    back_period = process_period(period)
-    start=datetime.now() - timedelta(days=back_period+current_app.config['BACK_PERIOD'])
-    return start
-
-def get_required_start_date(period):
-    back_period = process_period(period)
-    required_start = datetime.now() - timedelta(days=back_period)
-    return start
-
-def get_start_dates(period,length=0):
-    back_period = process_period(period)  
-    if period == "week":
+def get_start_dates(period,length, multiplier, frontend):
+    back_period = process_period(period,multiplier,frontend)  
+    if period == "minute":
+        back_days = back_period + int(length/current_app.config['TRADING_MINUTE_PER_DAY']) + current_app.config['BACK_PERIOD_MINUTE']
+    elif period == "week":
         back_days = back_period+(length*7)+(current_app.config['BACK_PERIOD']*7)
     elif period == "month":
         back_days = back_period+(length*30)+(current_app.config['BACK_PERIOD']*30)
@@ -32,11 +24,32 @@ def get_start_dates(period,length=0):
     
     start=datetime.now() - timedelta(days=back_days)
     required_start = datetime.now() - timedelta(days=back_period)
-    return start, required_start
+    limit = process_limit(period,frontend)  
+    return start, required_start,limit
 
-def process_period(period):
+def get_dates(period, multiplier, frontend):
+    back_period = process_period(period,multiplier,frontend) 
+    end=datetime.now()
+    start= end - timedelta(days=back_period)
+    limit = process_limit(period,frontend)      
+    return start, end,limit
+
+def process_period(period,multiplier,frontend):
     # Check if the DataFrame is empty
-    if period not in current_app.config['PERIOD_DICT']:
-        raise CustomException(f"The specified period is not configured",404)
+    if frontend in current_app.config['PERIOD_DICT']:
+        if period in current_app.config['PERIOD_DICT'][frontend]:
+            return current_app.config['PERIOD_DICT'][frontend][period] * multiplier
+        else:
+            raise CustomException(f"The specified period is not configured",404)
     else:
-      return current_app.config['PERIOD_DICT'][period]
+        raise CustomException(f"The specified period is not configured",404)
+
+def process_limit(period,frontend):
+    # Check if the DataFrame is empty
+    if frontend in current_app.config['LIMIT_DICT']:
+        if period in current_app.config['LIMIT_DICT'][frontend]:
+            return current_app.config['LIMIT_DICT'][frontend][period]
+        else:
+            raise CustomException(f"The specified period is not configured",404)
+    else:
+        raise CustomException(f"The specified period is not configured",404)

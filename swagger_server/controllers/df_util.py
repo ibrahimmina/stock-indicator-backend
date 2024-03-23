@@ -11,10 +11,21 @@ def cleandf(df,start,end,round_number,clean_regex,required_date_time_format):
     output['Date'] = output['Date'].dt.strftime(required_date_time_format)
     return output
 
-def cleandfupdated(df,stock,start,end,round_number,clean_regex):
+def cleandfupdated(df,stock,start,end,round_number,clean_regex,limit):
     tempDF = pd.merge(stock, df, left_index=True, right_index=True)
     tempDF = tempDF.drop(['Open', 'High', 'Low', 'Close','Adj Close', 'Volume'], axis=1)
     output = tempDF.loc[start.date():end.date()]
+    if len(output) > limit:
+        output = output.tail(limit)
+    output = output.round(round_number)
+    output.columns = output.columns.str.replace(clean_regex, "", regex=True)
+    output.fillna(0,inplace=True)
+    return output
+
+def cleandffinal(df,stock,round_number,clean_regex,limit):
+    tempDF = pd.merge(stock, df, left_index=True, right_index=True)
+    tempDF = tempDF.drop(['Open', 'High', 'Low', 'Close','Adj Close', 'Volume'], axis=1)
+    output = tempDF.tail(limit)
     output = output.round(round_number)
     output.columns = output.columns.str.replace(clean_regex, "", regex=True)
     output.fillna(0,inplace=True)

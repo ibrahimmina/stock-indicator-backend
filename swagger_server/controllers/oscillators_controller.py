@@ -25,13 +25,13 @@ from swagger_server.exceptions import CustomException
 
 
 from swagger_server.controllers.get_historical_data import get_historical_data_polygon, get_historical_data_yfinance, get_historical_data_polygon_updated
-from swagger_server.controllers.date_util import get_end_date, get_historical_start_date, get_required_start_date, get_start_dates
-from swagger_server.controllers.df_util import cleandf, cleandfupdated
+from swagger_server.controllers.date_util import get_end_date, get_start_dates, get_dates
+from swagger_server.controllers.df_util import cleandf, cleandfupdated, cleandffinal
 
 USE_POLYGON = current_app.config['USE_POLYGON']
 
 
-def calculate_cci(symbol, period, length=14, cci_scaling_constant=0.015):  # noqa: E501
+def calculate_cci(symbol, period, multiplier=1, frontend="Mobile", length=14, cci_scaling_constant=0.015):  # noqa: E501
     """Used to help determine when an investment vehicle is reaching a condition of being overbought or oversold.
 
      # noqa: E501
@@ -48,19 +48,19 @@ def calculate_cci(symbol, period, length=14, cci_scaling_constant=0.015):  # noq
     :rtype: Cci
     """
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period, length)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
+
         
         cci = stock.ta.cci(high=stock['High'], low=stock['Low'], close=stock['Close'], c=cci_scaling_constant, length=length)
 
         df = cci.to_frame()
         
-        output = cleandfupdated(df, stock, required_start, end, 2,"_.*$")
+        output = cleandffinal(df, stock, 2,"_.*$", limit)
         
         output = Cci.from_dict(output.to_dict(orient='records'))
         return output
@@ -70,7 +70,7 @@ def calculate_cci(symbol, period, length=14, cci_scaling_constant=0.015):  # noq
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_cmf(symbol, period, length=20):  # noqa: E501
+def calculate_cmf(symbol, period, multiplier=1, frontend="Mobile",length=20):  # noqa: E501
     """Chailin Money Flow measures the amount of money flow volume over a specific period in conjunction with Accumulation/Distribution.
 
      # noqa: E501
@@ -87,19 +87,18 @@ def calculate_cmf(symbol, period, length=20):  # noqa: E501
     :rtype: Cmf
     """
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period, length)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         cmf = stock.ta.cmf(high=stock['High'], low=stock['Low'], close=stock['Close'],open_=stock['Open'], length=length)
 
         df = cmf.to_frame()
         
-        output = cleandfupdated(df,stock, required_start, end, 2,"_.*$")
+        output = cleandffinal(df,stock, 2,"_.*$", limit)
         
         output = Cmf.from_dict(output.to_dict(orient='records'))
         return output
@@ -109,7 +108,7 @@ def calculate_cmf(symbol, period, length=20):  # noqa: E501
         else:
             return jsonify({'error': str(e)}), 500    
 
-def calculate_efi(symbol, period, length=13, drift=1):  # noqa: E501
+def calculate_efi(symbol, period, multiplier=1, frontend="Mobile",length=13, drift=1):  # noqa: E501
     """Elder&#x27;s Force Index measures the power behind a price movement using price and volume as well as potential reversals and price corrections.
 
      # noqa: E501
@@ -126,19 +125,18 @@ def calculate_efi(symbol, period, length=13, drift=1):  # noqa: E501
     :rtype: Efi
     """
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period, length)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         efi = stock.ta.efi(close=stock['Close'], volume=stock['Volume'], length=length, drift=drift)
 
         df = efi.to_frame()
 
-        output = cleandfupdated(df, stock, required_start, end, 2,"_.*$")
+        output = cleandffinal(df, stock, 2,"_.*$", limit)
 
         output = Efi.from_dict(output.to_dict(orient='records'))
         return output
@@ -149,7 +147,7 @@ def calculate_efi(symbol, period, length=13, drift=1):  # noqa: E501
             return jsonify({'error': str(e)}), 500
 
 
-def calculate_macd(symbol, period, fast=12, slow=26, signal=9):  # noqa: E501
+def calculate_macd(symbol, period, multiplier=1, frontend="Mobile",fast=12, slow=26, signal=9):  # noqa: E501
     """The MACD is a popular indicator to that is used to identify a security&#x27;s trend. While APO and MACD are the same calculation, MACD also returns two more series called Signal and Histogram. The Signal is an EMA of MACD and the Histogram is the difference of MACD and Signal.
 
      # noqa: E501
@@ -169,20 +167,19 @@ def calculate_macd(symbol, period, fast=12, slow=26, signal=9):  # noqa: E501
 
     :rtype: Macd
     """
-    length=30
+    #length=30
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         
         macd = stock.ta.macd(close=stock['Close'],fast=fast, slow=slow, signal=signal)
 
-        output = cleandfupdated(macd, stock, required_start, end, 2,"_.*$")
+        output = cleandffinal(macd, stock, 2,"_.*$", limit)
             
         output = Macd.from_dict(output.to_dict(orient='records'))
         return output
@@ -193,7 +190,7 @@ def calculate_macd(symbol, period, fast=12, slow=26, signal=9):  # noqa: E501
             return jsonify({'error': str(e)}), 500   
 
 
-def calculate_mfi(symbol, period, length=14, drift=1):  # noqa: E501
+def calculate_mfi(symbol, period, multiplier=1, frontend="Mobile",length=14, drift=1):  # noqa: E501
     """The Money Flow Index (MFI) is an oscillator that uses both price and volume to measure buying and selling pressure over a specified period of time.
 
      # noqa: E501
@@ -210,18 +207,17 @@ def calculate_mfi(symbol, period, length=14, drift=1):  # noqa: E501
     :rtype: Mfi
     """
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period, length)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         mfi = stock.ta.mfi(high=stock['High'], low=stock['Low'], close=stock['Close'],volume=stock['Volume'], length=length, drift=drift)
 
         df = mfi.to_frame()
-        output = cleandfupdated(df,stock, required_start, end, 2,"_.*$")
+        output = cleandffinal(df,stock, 2,"_.*$", limit)
         output = Mfi.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
@@ -230,7 +226,7 @@ def calculate_mfi(symbol, period, length=14, drift=1):  # noqa: E501
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_obv(symbol, period):  # noqa: E501
+def calculate_obv(symbol, period,multiplier=1, frontend="Mobile"):  # noqa: E501
     """The Money Flow Index (MFI) is an oscillator that uses both price and volume to measure buying and selling pressure over a specified period of time.
 
      # noqa: E501
@@ -244,23 +240,21 @@ def calculate_obv(symbol, period):  # noqa: E501
 
     :rtype: Obv
     """
-    length=0
+    #length=0
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         obv = stock.ta.obv(close=stock['Close'],volume=stock['Volume'])
 
         df = obv.to_frame()
 
-        output = cleandfupdated(df, stock,required_start, end, 2,"_.*$")
+        output = cleandffinal(df, stock, 2,"_.*$", limit)
         
-
         output = Obv.from_dict(output.to_dict(orient='records'))
         return output
     except Exception as e:
@@ -269,7 +263,7 @@ def calculate_obv(symbol, period):  # noqa: E501
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_psar(symbol, period, initial_acceleration=0.02, acceleration=0.02, max_acceleration=0.2):  # noqa: E501
+def calculate_psar(symbol, period, multiplier=1, frontend="Mobile",initial_acceleration=0.02, acceleration=0.02, max_acceleration=0.2):  # noqa: E501
     """An oscillator meaning that it operates between or within a set range of numbers or parameters..
 
      # noqa: E501
@@ -289,18 +283,18 @@ def calculate_psar(symbol, period, initial_acceleration=0.02, acceleration=0.02,
 
     :rtype: Psar
     """
+    #length=0
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         psar = stock.ta.psar(high=stock['High'], low=stock['Low'], close=stock['Close'],af0=initial_acceleration,af=acceleration,max_af=max_acceleration)
 
-        output = cleandfupdated(psar, stock,required_start, end, 2,"_.*$")
+        output = cleandffinal(psar, stock, 2,"_.*$", limit)
         
         output = Psar.from_dict(output.to_dict(orient='records'))
 
@@ -311,7 +305,7 @@ def calculate_psar(symbol, period, initial_acceleration=0.02, acceleration=0.02,
         else:
             return jsonify({'error': str(e)}), 500
             
-def calculate_ppo(symbol, period, fast=12, slow=26, signal=9, scalar=100):  # noqa: E501
+def calculate_ppo(symbol, period, multiplier=1, frontend="Mobile",fast=12, slow=26, signal=9, scalar=100):  # noqa: E501
     """The Percentage Price Oscillator is similar to MACD in measuring momentum.
 
      # noqa: E501
@@ -333,19 +327,18 @@ def calculate_ppo(symbol, period, fast=12, slow=26, signal=9, scalar=100):  # no
 
     :rtype: Ppo
     """
-    
+    #length=0
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         ppo = stock.ta.ppo(close=stock['Close'], fast=fast, slow=slow, signal=signal, scalar=scalar)
 
-        output = cleandfupdated(ppo, stock,required_start, end, 2,"_.*$")
+        output = cleandffinal(ppo, stock, 2,"_.*$", limit)
         
         output = Ppo.from_dict(output.to_dict(orient='records'))
 
@@ -356,7 +349,7 @@ def calculate_ppo(symbol, period, fast=12, slow=26, signal=9, scalar=100):  # no
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_pvo(symbol, period, fast=12, slow=26, signal=9, scalar=100):  # noqa: E501
+def calculate_pvo(symbol, period, multiplier=1, frontend="Mobile",fast=12, slow=26, signal=9, scalar=100):  # noqa: E501
     """Percentage Volume Oscillator is a Momentum Oscillator for Volume.
 
      # noqa: E501
@@ -378,19 +371,18 @@ def calculate_pvo(symbol, period, fast=12, slow=26, signal=9, scalar=100):  # no
 
     :rtype: Pvo
     """
-
+    #length=0
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         pvo = stock.ta.pvo(volume=stock['Volume'], fast=fast, slow=slow, signal=signal, scalar=scalar)
 
-        output = cleandfupdated(pvo, stock,required_start, end, 2,"_.*$")
+        output = cleandffinal(pvo, stock, 2,"_.*$", limit)
         
         output = Pvo.from_dict(output.to_dict(orient='records'))
 
@@ -403,7 +395,7 @@ def calculate_pvo(symbol, period, fast=12, slow=26, signal=9, scalar=100):  # no
 
 
 
-def calculate_roc(symbol, period, length=1, scalar=100):  # noqa: E501
+def calculate_roc(symbol, period, multiplier=1, frontend="Mobile",length=1, scalar=100):  # noqa: E501
     """Elder&#x27;s Force Index measures the power behind a price movement using price and volume as well as potential reversals and price corrections.
 
      # noqa: E501
@@ -420,19 +412,18 @@ def calculate_roc(symbol, period, length=1, scalar=100):  # noqa: E501
     :rtype: Roc
     """
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period, length)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         roc = stock.ta.roc(close=stock['Close'],length=length, scalar=scalar)
 
         df = roc.to_frame()
 
-        output = cleandfupdated(df, stock, required_start, end, 2,"_.*$")
+        output = cleandffinal(df, stock, 2,"_.*$", limit)
 
         output = Roc.from_dict(output.to_dict(orient='records'))
         return output
@@ -442,7 +433,7 @@ def calculate_roc(symbol, period, length=1, scalar=100):  # noqa: E501
         else:
             return jsonify({'error': str(e)}), 500
 
-def calculate_rsi(symbol, period, length=14, scalar=100, drift=1):  # noqa: E501
+def calculate_rsi(symbol, period, multiplier=1, frontend="Mobile",length=14, scalar=100, drift=1):  # noqa: E501
     """The Relative Strength Index is popular momentum oscillator used to measure the velocity as well as the magnitude of directional price movements.
 
      # noqa: E501
@@ -461,19 +452,18 @@ def calculate_rsi(symbol, period, length=14, scalar=100, drift=1):  # noqa: E501
     :rtype: Rsi
     """
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period, length)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         rsi = stock.ta.rsi(close=stock['Close'], length=length, scalar=scalar, drift=drift)
 
         df = rsi.to_frame()
 
-        output = cleandfupdated(df, stock, required_start, end, 2,"_.*$")
+        output = cleandffinal(df, stock, 2,"_.*$", limit)
 
         output = Rsi.from_dict(output.to_dict(orient='records'))
         
@@ -486,7 +476,7 @@ def calculate_rsi(symbol, period, length=14, scalar=100, drift=1):  # noqa: E501
             return jsonify({'error': str(e)}), 500
 
 
-def calculate_stoch(symbol, period, fast=14, slow=3, smooth_k=3):  # noqa: E501
+def calculate_stoch(symbol, period, multiplier=1, frontend="Mobile",fast=14, slow=3, smooth_k=3):  # noqa: E501
     """The Stochastic Oscillator (STOCH) was developed by George Lane in the 1950&#x27;s. He believed this indicator was a good way to measure momentum because changes in momentum precede changes in price.
 
      # noqa: E501
@@ -504,18 +494,18 @@ def calculate_stoch(symbol, period, fast=14, slow=3, smooth_k=3):  # noqa: E501
 
     :rtype: Stoch
     """
+    length=0
     try:
-        end = get_end_date()
-        start, required_start = get_start_dates(period)
+        #end = get_end_date()
+        #start, required_start, limit = get_start_dates(period, length, multiplier=multiplier, frontend=frontend)
 
-        if USE_POLYGON == True:
-            stock=get_historical_data_polygon_updated(symbol,start,end, period)
-        else:
-            stock=get_historical_data_yfinance(symbol,start,end)
+        start, end, limit = get_dates(period,multiplier,frontend)
+
+        stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
         stoch = stock.ta.stoch(high=stock['High'],low=stock['Low'],close=stock['Close'],k=int(fast), d=int(slow), smooth_k=int(smooth_k))
 
-        output = cleandfupdated(stoch, stock, required_start, end, 2,"_.*$")
+        output = cleandffinal(stoch, stock, 2,"_.*$", limit)
             
         output = Stoch.from_dict(output.to_dict(orient='records'))
         return output

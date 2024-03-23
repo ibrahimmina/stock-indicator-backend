@@ -45,10 +45,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
       responses:
         "200":
           description: successful operation
@@ -89,10 +111,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
       responses:
         "200":
           description: successful operation
@@ -131,10 +175,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: The short period
@@ -182,10 +248,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: The short period
@@ -235,10 +323,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: The short period
@@ -297,10 +407,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: period length
@@ -379,10 +511,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: fast
           in: query
           description: The short period
@@ -448,10 +602,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: fast
           in: query
           description: The short period
@@ -526,10 +702,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: fast
           in: query
           description: The short period
@@ -606,10 +804,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: initial_acceleration
           in: query
           description: The psar initial acceleration
@@ -677,10 +897,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: period length
@@ -739,10 +981,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: period length
@@ -801,10 +1065,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
       responses:
         "200":
           description: successful operation
@@ -845,10 +1131,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: period length
@@ -907,10 +1215,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: period length
@@ -969,10 +1299,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: period length
@@ -1022,10 +1374,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: length
           in: query
           description: period length
@@ -1094,10 +1468,32 @@ paths:
           schema:
             type: string
             enum:
-              - day
+              - minute
               - hour
+              - day
               - week
               - month
+        - name: multiplier
+          in: query
+          description: The size of the timespan multiplier.
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: integer
+            default: 1
+        - name: frontend
+          in: query
+          description: The Type of Frontend
+          required: false
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - Web
+              - Mobile
+            default: Mobile
         - name: fast
           in: query
           description: The Fast %K period.

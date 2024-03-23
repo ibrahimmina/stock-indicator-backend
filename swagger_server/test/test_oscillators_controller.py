@@ -29,8 +29,9 @@ class TestOscillatorsController(BaseTestCase):
         Used to help determine when an investment vehicle is reaching a condition of being overbought or oversold.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('length', 14),
                         ('cci_scaling_constant', 0.015)]
         response = self.client.open(
@@ -46,8 +47,9 @@ class TestOscillatorsController(BaseTestCase):
         Chailin Money Flow measures the amount of money flow volume over a specific period in conjunction with Accumulation/Distribution.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('length', 20)]
         response = self.client.open(
             '//cmf',
@@ -62,8 +64,9 @@ class TestOscillatorsController(BaseTestCase):
         Elder's Force Index measures the power behind a price movement using price and volume as well as potential reversals and price corrections.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('length', 13),
                         ('drift', 1)]
         response = self.client.open(
@@ -79,8 +82,9 @@ class TestOscillatorsController(BaseTestCase):
         The MACD is a popular indicator to that is used to identify a security's trend. While APO and MACD are the same calculation, MACD also returns two more series called Signal and Histogram. The Signal is an EMA of MACD and the Histogram is the difference of MACD and Signal.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('fast', 12),
                         ('slow', 26),
                         ('signal', 9)]
@@ -97,8 +101,9 @@ class TestOscillatorsController(BaseTestCase):
         The Money Flow Index (MFI) is an oscillator that uses both price and volume to measure buying and selling pressure over a specified period of time.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('length', 14),
                         ('drift', 1)]
         response = self.client.open(
@@ -114,8 +119,9 @@ class TestOscillatorsController(BaseTestCase):
         The Money Flow Index (MFI) is an oscillator that uses both price and volume to measure buying and selling pressure over a specified period of time.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2)]
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile')]
         response = self.client.open(
             '//obv',
             method='GET',
@@ -129,8 +135,9 @@ class TestOscillatorsController(BaseTestCase):
         The Percentage Price Oscillator is similar to MACD in measuring momentum.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('fast', 12),
                         ('slow', 26),
                         ('signal', 9),
@@ -148,8 +155,9 @@ class TestOscillatorsController(BaseTestCase):
         An oscillator meaning that it operates between or within a set range of numbers or parameters..
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('initial_acceleration', 0.02),
                         ('acceleration', 0.02),
                         ('max_acceleration', 0.2)]
@@ -166,8 +174,9 @@ class TestOscillatorsController(BaseTestCase):
         Percentage Volume Oscillator is a Momentum Oscillator for Volume.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('fast', 12),
                         ('slow', 26),
                         ('signal', 9),
@@ -185,8 +194,9 @@ class TestOscillatorsController(BaseTestCase):
         Elder's Force Index measures the power behind a price movement using price and volume as well as potential reversals and price corrections.
         """
         query_string = [('symbol', 'symbol_example'),
-                        ('start_date', 'start_date_example'),
-                        ('period', 2),
+                        ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('length', 1),
                         ('scalar', 100)]
         response = self.client.open(
@@ -203,6 +213,8 @@ class TestOscillatorsController(BaseTestCase):
         """
         query_string = [('symbol', 'symbol_example'),
                         ('period', 'period_example'),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
                         ('length', 14),
                         ('scalar', 100),
                         ('drift', 1)]
@@ -220,8 +232,10 @@ class TestOscillatorsController(BaseTestCase):
         """
         query_string = [('symbol', 'symbol_example'),
                         ('period', 'period_example'),
-                        ('k', 14),
-                        ('d', 3),
+                        ('multiplier', 1),
+                        ('frontend', 'Mobile'),
+                        ('fast', 14),
+                        ('slow', 3),
                         ('smooth_k', 3)]
         response = self.client.open(
             '//stoch',
@@ -229,7 +243,8 @@ class TestOscillatorsController(BaseTestCase):
             query_string=query_string)
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
-                       
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()
