@@ -28,18 +28,18 @@ class Config(object):
     }
     LIMIT_DICT = {
         'Mobile':{
-            'minute': 100,
-            'hour': 100,
-            'day': 100,
-            'week': 100,
-            'month': 100
+            'minute': 125,
+            'hour': 125,
+            'day': 125,
+            'week': 125,
+            'month': 125
         },
         'Web':{
-            'minute': 200,
-            'hour': 200,
-            'day': 200,
-            'week': 200,
-            'month': 200
+            'minute': 250,
+            'hour': 250,
+            'day': 250,
+            'week': 250,
+            'month': 250
         }
     }
 class ProductionConfig(Config):
