@@ -94,7 +94,7 @@ def calculate_cmf(symbol, period, multiplier=1, frontend="Mobile",length=20):  #
 
         stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
-        cmf = stock.ta.cmf(high=stock['High'], low=stock['Low'], close=stock['Close'],open_=stock['Open'], length=length)
+        cmf = stock.ta.cmf(high=stock['High'], low=stock['Low'], close=stock['Close'], length=length)
 
         df = cmf.to_frame()
         
