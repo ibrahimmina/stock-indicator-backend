@@ -336,7 +336,7 @@ def calculate_ppo(symbol, period, multiplier=1, frontend="Mobile",fast=12, slow=
 
         stock=get_historical_data_polygon_updated(symbol,start,end, period, multiplier)
         
-        ppo = stock.ta.ppo(close=stock['Close'], fast=fast, slow=slow, signal=signal, scalar=scalar)
+        ppo = stock.ta.ppo(close=stock['Close'], fast=fast, slow=slow, signal=signal, scalar=scalar, mamode="ema")
 
         output = cleandffinal(ppo, stock, 2,"_.*$", limit)
         

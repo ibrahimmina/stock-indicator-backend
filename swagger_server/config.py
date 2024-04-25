@@ -28,11 +28,11 @@ class Config(object):
     }
     LIMIT_DICT = {
         'Mobile':{
-            'minute': 125,
-            'hour': 125,
-            'day': 125,
-            'week': 125,
-            'month': 125
+            'minute': 70,
+            'hour': 70,
+            'day': 70,
+            'week': 70,
+            'month': 70
         },
         'Web':{
             'minute': 250,
